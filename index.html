@@ -1,0 +1,672 @@
+<!doctype html>
+<html lang="bg">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
+<meta name="theme-color" content="#0a0a0a"/>
+<meta name="description" content="Упражнения по китара - метроном, акорди и стръминг патерни"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Guitar Practice"/>
+<link rel="apple-touch-icon" href="icon-180.png"/>
+<link rel="icon" type="image/png" href="icon-180.png"/>
+<link rel="manifest" href="manifest.json"/>
+<title>Guitar Practice</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0a; --panel:#141210; --line:#2b2724;
+  --gold:#f0b429; --txt:#f5f0e8; --muted:#8a8078;
+}
+html,body{background:var(--bg);color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;-webkit-tap-highlight-color:transparent}
+body{min-height:100vh;background:radial-gradient(ellipse at 50% -10%,#1e1810 0%,#0a0a0a 55%);
+  /* safe-area = зоната под "чéлката" и лентата за жестове на iPhone */
+  padding:calc(18px + env(safe-area-inset-top)) 0 calc(44px + env(safe-area-inset-bottom));
+  overscroll-behavior-y:none;                    /* без "гумено" дърпане в Safari */
+  -webkit-text-size-adjust:100%}
+.wrap{max-width:660px;margin:0 auto;
+  padding-left:calc(16px + env(safe-area-inset-left));
+  padding-right:calc(16px + env(safe-area-inset-right))}
+button,select,.beat{touch-action:manipulation}   /* без zoom при двойно почукване */
+
+select{width:100%;background:#141210;color:var(--txt);border:1px solid var(--line);border-radius:12px;
+  padding:13px 16px;font-size:15px;outline:none;appearance:none;cursor:pointer;
+  background-image:linear-gradient(45deg,transparent 50%,var(--gold) 50%),linear-gradient(135deg,var(--gold) 50%,transparent 50%);
+  background-position:calc(100% - 20px) 52%,calc(100% - 15px) 52%;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+optgroup{background:#111;color:var(--gold)}
+option{background:#111;color:var(--txt)}
+
+h2{text-align:center;font-size:23px;font-weight:800;margin:20px 0 12px;letter-spacing:.2px}
+
+.anchorWrap{display:flex;justify-content:center;margin-bottom:16px}
+.anchor{background:#151311;border:1.5px solid #4a4038;color:#cfc6bb;border-radius:999px;
+  padding:11px 22px;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s}
+.anchor:hover{border-color:#6a5c4a}
+.anchor.on{background:linear-gradient(180deg,#3b2c11,#241b0c);border-color:var(--gold);color:var(--gold);
+  box-shadow:0 0 22px rgba(240,180,41,.25)}
+.anchor.dis{opacity:.35;cursor:default}
+
+.dots{display:flex;gap:6px;justify-content:center;margin-bottom:18px;flex-wrap:wrap}
+.dot{width:7px;height:7px;border-radius:4px;background:#3a3430;transition:all .18s}
+.dot.on{background:var(--gold);width:22px;box-shadow:0 0 10px rgba(240,180,41,.55)}
+
+.card{background:linear-gradient(180deg,#151311,#100e0d);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px}
+
+.chords{display:flex;align-items:center;justify-content:center;gap:12px;min-height:222px}
+.slot{flex:0 0 auto;opacity:.5;transition:opacity .25s}
+.slot svg{display:block;width:104px;height:auto}
+.slot.center{opacity:1}
+.slot.center svg{width:150px}
+.slot.center .frame{border:2px solid var(--gold);box-shadow:0 0 30px rgba(240,180,41,.25),inset 0 0 34px rgba(240,180,41,.05)}
+.frame{border:1px solid var(--line);border-radius:14px;padding:0 8px 8px;background:linear-gradient(180deg,#2b2117 0%,#181410 45%,#121010 100%)}
+
+.label{text-align:center;font-size:9.5px;letter-spacing:2.6px;color:#6d645c;margin-bottom:14px}
+
+.strum{display:flex;gap:8px;justify-content:center}
+.beat{flex:1;max-width:54px;aspect-ratio:1/1;border:1px solid var(--line);border-radius:11px;
+  display:flex;align-items:center;justify-content:center;font-size:21px;color:#332e2a;background:#100e0d;
+  transition:all .07s;cursor:pointer;user-select:none}
+.beat.act{color:var(--gold);border-color:#4a3c1c;background:#181309}
+.beat.hit{background:var(--gold);color:#12100c;border-color:var(--gold);transform:scale(1.12);box-shadow:0 0 20px rgba(240,180,41,.5)}
+.beat.hit.rest{background:#282320;color:#6b625a;box-shadow:none;transform:scale(1.05)}
+
+.row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.row .k{font-size:13px;color:var(--muted)}
+.row .v{font-size:18px;font-weight:700;color:var(--gold)}
+input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:6px;border-radius:4px;background:#3a3430;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--gold);box-shadow:0 0 14px rgba(240,180,41,.55);cursor:pointer}
+input[type=range]::-moz-range-thumb{width:24px;height:24px;border:0;border-radius:50%;background:var(--gold);cursor:pointer}
+
+.presets{display:flex;gap:10px;margin-top:16px}
+.presets button{flex:1;background:#1a1817;border:1px solid var(--line);color:var(--txt);border-radius:11px;padding:12px 0;font-size:15px;cursor:pointer}
+.presets button:active{background:#262220}
+
+.play{width:100%;margin-top:14px;background:linear-gradient(180deg,#2a2113,#1d1810);border:2px solid var(--gold);
+  color:var(--gold);border-radius:13px;padding:17px;font-size:19px;font-weight:700;cursor:pointer;letter-spacing:.4px}
+.play:active{transform:scale(.995)}
+.play.on{background:var(--gold);color:#141008}
+.play.cnt{background:linear-gradient(180deg,#2a2113,#1d1810);color:var(--gold);font-size:26px;letter-spacing:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<select id="songSel"></select>
+
+<h2 id="title">—</h2>
+<div class="anchorWrap"><button class="anchor" id="anchorBtn">⚓ Anchor chords</button></div>
+<div class="dots" id="dots"></div>
+
+<div class="card"><div class="chords" id="chords"></div></div>
+
+<div class="card">
+  <div class="label">STRUMMING PATTERN</div>
+  <div class="strum" id="strum"></div>
+</div>
+
+<div class="card">
+  <div class="row"><span class="k">BPM</span><span class="v" id="bpmVal">60</span></div>
+  <input type="range" id="bpm" min="35" max="200" value="60"/>
+  <div class="presets">
+    <button data-b="40">40</button><button data-b="60">60</button>
+    <button data-b="80">80</button><button data-b="100">100</button>
+  </div>
+  <button class="play" id="play">▶ Play</button>
+</div>
+
+</div>
+
+<script>
+/* ================= АКОРДИ ================= */
+const CHORDS = {
+  'C':     {f:[-1,3,2,0,1,0], g:[0,3,2,0,1,0]},
+  'Cadd9': {f:[-1,3,2,0,3,3], g:[0,2,1,0,3,4]},
+  'D':     {f:[-1,-1,0,2,3,2], g:[0,0,0,1,3,2]},
+  'Dsus4': {f:[-1,-1,0,2,3,3], g:[0,0,0,1,3,4]},
+  'Dsus2': {f:[-1,-1,0,2,3,0], g:[0,0,0,1,2,0]},
+  'D6/9':  {f:[-1,-1,0,2,0,0], g:[0,0,0,1,0,0]},
+  'Dm':    {f:[-1,-1,0,2,3,1], g:[0,0,0,2,3,1]},
+  'D7':    {f:[-1,-1,0,2,1,2], g:[0,0,0,3,1,2]},
+  'E':     {f:[0,2,2,1,0,0], g:[0,2,3,1,0,0]},
+  'Em':    {f:[0,2,2,0,0,0], g:[0,2,3,0,0,0]},
+  'Em7':   {f:[0,2,2,0,3,3], g:[0,2,1,0,3,4]},
+  'E7':    {f:[0,2,0,1,0,0], g:[0,2,0,1,0,0]},
+  'F':     {f:[1,3,3,2,1,1], g:[1,3,4,2,1,1], barre:{fret:1,from:0,to:5}},
+  'Fmaj7': {f:[-1,-1,3,2,1,0], g:[0,0,3,2,1,0]},
+  'G':     {f:[3,2,0,0,0,3], g:[3,2,0,0,0,4]},
+  'G7':    {f:[3,2,0,0,0,1], g:[3,2,0,0,0,1]},
+  'A':     {f:[-1,0,2,2,2,0], g:[0,0,1,2,3,0]},
+  'Am':    {f:[-1,0,2,2,1,0], g:[0,0,2,3,1,0]},
+  'Am7':   {f:[-1,0,2,0,1,0], g:[0,0,2,0,1,0]},
+  'A7':    {f:[-1,0,2,0,2,0], g:[0,0,2,0,3,0]},
+  'A7sus4':{f:[-1,0,2,0,3,0], g:[0,0,1,0,3,0]},
+  'Asus2': {f:[-1,0,2,2,0,0], g:[0,0,1,2,0,0]},
+  'Bm':    {f:[-1,2,4,4,3,2], g:[0,1,3,4,2,1], barre:{fret:2,from:1,to:5}},
+  'B7':    {f:[-1,2,1,2,0,2], g:[0,2,1,3,0,4]},
+  'F#m':   {f:[2,4,4,2,2,2], g:[1,3,4,1,1,1], barre:{fret:2,from:0,to:5}},
+
+  /* --- ANCHOR ВЕРСИЯ: пръсти 3 и 4 остават заковани на B и e струна, 3-ти праг --- */
+  'G@':    {f:[3,2,0,0,3,3], g:[2,1,0,0,3,4], label:'G'}
+};
+
+/* Кой акорд с кой се заменя, когато Anchor chords е включено */
+const ANCHOR = { 'G':'G@', 'C':'Cadd9', 'D':'Dsus4', 'Em':'Em7' };
+let anchorOn = false;
+const A = n => (anchorOn && ANCHOR[n]) ? ANCHOR[n] : n;
+
+const P = {
+  DOWN:   ['D','-','D','-','D','-','D','-'],
+  POP:    ['D','-','D','U','-','U','D','U'],
+  HEAVEN: ['D','-','-','-','D','-','D','U'],
+  FOLK:   ['D','-','D','U','D','-','D','U'],
+  SIMPLE: ['D','-','-','-','D','-','-','-'],
+  ROCK:   ['D','-','D','U','D','U','D','U'],
+  BALLAD: ['D','-','-','U','-','U','D','-']
+};
+
+/* ================= ПЕСНИ И УПРАЖНЕНИЯ ================= */
+const G1='Play Throughs (Beginner)', G2='Play Throughs (Easy)', G3='Play Throughs (Medium)',
+      G4='Play Throughs (Hard)', G5='G C Em D Chords Only', G6='Fingerstyle Favourites',
+      G7='Преходи между акорди';
+
+const LIST = [
+ /* ---------- BEGINNER ---------- */
+ {grp:G1, n:"Perfect — Ed Sheeran (Easiest)",   b:64, p:P.POP,    c:['G','Em','C','D']},
+ {grp:G1, n:"Tennessee Whiskey — Chris Stapleton", b:50, p:P.BALLAD, c:['G','Am','G','Am']},
+ {grp:G1, n:"Stand By Me — Ben E. King",        b:72, p:P.BALLAD, c:['G','G','Em','Em','C','D','G','G']},
+ {grp:G1, n:"Wagon Wheel — Darius Rucker",      b:76, p:P.POP,    c:['G','D','Em','C']},
+ {grp:G1, n:"Brown Eyed Girl — Van Morrison",   b:76, p:P.POP,    c:['G','C','G','D']},
+ {grp:G1, n:"Revival — Zach Bryan",             b:80, p:P.POP,    c:['G','D','Em','C']},
+ {grp:G1, n:"Heaven — Bryan Adams",             b:66, p:P.POP,    c:['G','D','Em','C']},
+ {grp:G1, n:"Knockin' on Heaven's Door — Bob Dylan", b:60, p:P.HEAVEN, c:['G','D','Am','Am','G','D','C','C']},
+ {grp:G1, n:"Leavin' On A Jet Plane — John Denver", b:72, p:P.FOLK, c:['G','C','G','C','G','C','D','D']},
+
+ /* ---------- EASY ---------- */
+ {grp:G2, n:"Ain't No Sunshine — Bill Withers", b:70, p:P.SIMPLE, c:['Am','Em','G','Am']},
+ {grp:G2, n:"Stand By Me — Ben E. King",        b:72, p:P.BALLAD, c:['G','G','Em','Em','C','D','G','G']},
+ {grp:G2, n:"Wagon Wheel — Darius Rucker",      b:76, p:P.POP,    c:['G','D','Em','C']},
+ {grp:G2, n:"Chicken Fried — Zac Brown Band",   b:84, p:P.POP,    c:['G','C','G','D']},
+ {grp:G2, n:"Learning to Fly — Tom Petty",      b:74, p:P.POP,    c:['F','C','Am','G']},
+ {grp:G2, n:"Worst Way — Riley Green",          b:76, p:P.POP,    c:['G','D','Em','C']},
+ {grp:G2, n:"I'm Yours — Jason Mraz",           b:76, p:P.POP,    c:['C','G','Am','F']},
+ {grp:G2, n:"Take Me Home, Country Roads — John Denver", b:82, p:P.POP, c:['G','Em','D','C','G','D','G','G']},
+ {grp:G2, n:"Mr. Jones — Counting Crows",       b:88, p:P.POP,    c:['Am','F','Dm','G']},
+ {grp:G2, n:"Good Riddance — Green Day",        b:82, p:P.FOLK,   c:['G','C','D','D']},
+ {grp:G2, n:"Every Rose Has Its Thorn — Poison",b:66, p:P.POP,    c:['G','C','G','D']},
+
+ /* ---------- MEDIUM ---------- */
+ {grp:G3, n:"Riptide — Vance Joy",              b:100,p:P.POP,    c:['Am','G','C','C']},
+ {grp:G3, n:"Ring of Fire — Johnny Cash",       b:96, p:P.FOLK,   c:['G','C','G','G','D','C','G','G']},
+ {grp:G3, n:"Folsom Prison Blues — Johnny Cash",b:100,p:P.ROCK,   c:['E','E','A','A','E','E','B7','E']},
+ {grp:G3, n:"Drift Away — Uncle Kracker",       b:84, p:P.POP,    c:['G','C','G','D']},
+ {grp:G3, n:"Can't Help Falling in Love — Elvis",b:56,p:P.BALLAD, c:['C','Em','Am','F','C','G','C','C']},
+ {grp:G3, n:"Fast Car — Tracy Chapman",         b:100,p:P.POP,    c:['C','G','Em','D']},
+ {grp:G3, n:"You're Still The One — Shania Twain",b:64,p:P.POP,   c:['C','F','C','G']},
+ {grp:G3, n:"Free Fallin' — Tom Petty",         b:82, p:P.POP,    c:['D','A','G','A']},
+ {grp:G3, n:"Hey, Soul Sister — Train",         b:97, p:P.POP,    c:['C','G','Am','F']},
+ {grp:G3, n:"Hallelujah — Leonard Cohen",       b:56, p:P.BALLAD, c:['C','Am','C','Am','F','G','C','G']},
+ {grp:G3, n:"Have You Ever Seen The Rain — CCR",b:88, p:P.POP,    c:['Am','F','C','G','C','G','F','C']},
+ {grp:G3, n:"Hey There Delilah — Plain White T's",b:60,p:P.SIMPLE,c:['D','F#m','D','F#m']},
+ {grp:G3, n:"Night Moves — Bob Seger",          b:80, p:P.FOLK,   c:['G','C','D','G']},
+ {grp:G3, n:"Take It Easy — Eagles",            b:92, p:P.POP,    c:['G','D','C','G']},
+ {grp:G3, n:"Wish You Were Here — Pink Floyd",  b:60, p:P.FOLK,   c:['C','D','Am','Am','C','D','G','G']},
+ {grp:G3, n:"Blowin' in the Wind — Bob Dylan",  b:80, p:P.FOLK,   c:['G','C','G','G','C','D','G','G']},
+
+ /* ---------- HARD ---------- */
+ {grp:G4, n:"Starting Over — Chris Stapleton",  b:78, p:P.POP,    c:['G','D','Em','C']},
+ {grp:G4, n:"Wonderwall — Oasis",               b:87, p:P.POP,    c:['Em7','G','Dsus4','A7sus4']},
+ {grp:G4, n:"Landslide — Fleetwood Mac",        b:70, p:P.SIMPLE, c:['C','G','Am7','G']},
+
+ /* ---------- САМО G C Em D ---------- */
+ {grp:G5, n:"Stand By Me — Ben E. King",        b:72, p:P.BALLAD, c:['G','Em','C','D']},
+ {grp:G5, n:"Wagon Wheel — Darius Rucker",      b:76, p:P.POP,    c:['G','D','Em','C']},
+ {grp:G5, n:"Revival — Zach Bryan",             b:80, p:P.POP,    c:['G','D','Em','C']},
+ {grp:G5, n:"Brown Eyed Girl — Van Morrison",   b:76, p:P.POP,    c:['G','C','G','D']},
+ {grp:G5, n:"Leavin' On A Jet Plane — John Denver", b:72, p:P.FOLK, c:['G','C','G','C','G','C','D','D']},
+ {grp:G5, n:"Chicken Fried — Zac Brown Band",   b:84, p:P.POP,    c:['G','C','G','D']},
+ {grp:G5, n:"Take Me Home, Country Roads",      b:82, p:P.POP,    c:['G','Em','D','C']},
+ {grp:G5, n:"Every Rose Has Its Thorn (Easy)",  b:66, p:P.POP,    c:['G','C','G','D']},
+ {grp:G5, n:"I'm Yours — Jason Mraz",           b:76, p:P.POP,    c:['G','D','Em','C']},
+ {grp:G5, n:"Good Riddance — Green Day",        b:82, p:P.FOLK,   c:['G','C','D','D']},
+ {grp:G5, n:"Blowin' in the Wind — Bob Dylan",  b:80, p:P.FOLK,   c:['G','C','G','D']},
+ {grp:G5, n:"Ring of Fire — Johnny Cash",       b:96, p:P.FOLK,   c:['G','C','G','D']},
+
+ /* ---------- FINGERSTYLE ---------- */
+ {grp:G6, n:"Ain't No Sunshine — Bill Withers", b:64, p:P.SIMPLE, c:['Am','Em','G','Am']},
+ {grp:G6, n:"Fast Car — Tracy Chapman",         b:66, p:P.SIMPLE, c:['C','G','Em','D']},
+ {grp:G6, n:"Hey There Delilah — Plain White T's",b:58,p:P.SIMPLE,c:['D','F#m','D','F#m']},
+ {grp:G6, n:"Hallelujah — Leonard Cohen",       b:52, p:P.SIMPLE, c:['C','Am','C','Am','F','G','C','G']},
+ {grp:G6, n:"Can't Help Falling in Love — Elvis",b:50,p:P.SIMPLE, c:['C','Em','Am','F','C','G','C','C']},
+ {grp:G6, n:"Landslide — Fleetwood Mac",        b:62, p:P.SIMPLE, c:['C','G','Am7','G']},
+
+ /* ---------- ДРУГИ ПЕСНИ ---------- */
+ {grp:'Още песни', n:"Zombie — The Cranberries", b:84, p:P.POP,  c:['Em','C','G','D']},
+ {grp:'Още песни', n:"A Horse With No Name",     b:80, p:P.POP,  c:['Em','D6/9','Em','D6/9']},
+ {grp:'Още песни', n:"Let It Be — The Beatles",  b:72, p:P.POP,  c:['C','G','Am','Fmaj7','C','G','F','C']},
+ {grp:'Още песни', n:"Bad Moon Rising — CCR",    b:90, p:P.FOLK, c:['D','A','G','D','D','A','G','D']},
+ {grp:'Още песни', n:"Hey Jude — The Beatles",   b:74, p:P.POP,  c:['C','G','G7','C','F','C','G','C']},
+ {grp:'Още песни', n:"Sweet Home Alabama",       b:98, p:P.ROCK, c:['D','Cadd9','G','G']},
+ {grp:'Още песни', n:"House of the Rising Sun",  b:70, p:P.FOLK, c:['Am','C','D','F','Am','C','E','E']},
+ {grp:'Още песни', n:"Save Tonight (Am F C G)",  b:88, p:P.POP,  c:['Am','F','C','G']},
+
+ {grp:G7, n:"G ↔ C",            b:50, p:P.DOWN, c:['G','C']},
+ {grp:'Преходи между акорди', n:"G ↔ D",            b:50, p:P.DOWN, c:['G','D']},
+ {grp:'Преходи между акорди', n:"C ↔ Am",           b:50, p:P.DOWN, c:['C','Am']},
+ {grp:'Преходи между акорди', n:"C ↔ G",            b:50, p:P.DOWN, c:['C','G']},
+ {grp:'Преходи между акорди', n:"Am ↔ E",           b:50, p:P.DOWN, c:['Am','E']},
+ {grp:'Преходи между акорди', n:"Am ↔ F",           b:45, p:P.DOWN, c:['Am','F']},
+ {grp:'Преходи между акорди', n:"D ↔ A",            b:50, p:P.DOWN, c:['D','A']},
+ {grp:'Преходи между акорди', n:"Em ↔ G",           b:55, p:P.DOWN, c:['Em','G']},
+ {grp:'Преходи между акорди', n:"E ↔ A ↔ D",        b:52, p:P.DOWN, c:['E','A','D']},
+ {grp:'Преходи между акорди', n:"G · D · Am · C",   b:55, p:P.DOWN, c:['G','D','Am','C']},
+ {grp:'Преходи между акорди', n:"C · G · Am · F",   b:55, p:P.DOWN, c:['C','G','Am','F']},
+ {grp:'Преходи между акорди', n:"C · Am · F · G",   b:55, p:P.DOWN, c:['C','Am','F','G']},
+ {grp:'Преходи между акорди', n:"Баре F ↔ C",       b:42, p:P.SIMPLE, c:['F','C']},
+ {grp:'Преходи между акорди', n:"Баре Bm ↔ G",      b:45, p:P.SIMPLE, c:['Bm','G']},
+ {grp:'Преходи между акорди', n:"D · Dsus4 · D · Dsus2", b:60, p:P.FOLK, c:['D','Dsus4','D','Dsus2']},
+ {grp:'Преходи между акорди', n:"12-тактов блус в A", b:80, p:P.ROCK, c:['A','A','A','A','D','D','A','A','E','D','A','E']}
+];
+
+/* ================= ДИАГРАМА ================= */
+function chordSVG(name){
+  const c = CHORDS[name];
+  if(!c) return '<svg viewBox="0 0 122 176"></svg>';
+  const pos = c.f.filter(x=>x>0);
+  const maxF = pos.length?Math.max(...pos):0, minF = pos.length?Math.min(...pos):0;
+  const base = maxF>4 ? minF : 1;
+  const NF=5, L=16, SP=18, TOP=52, FH=21;
+  const x = i => L + i*SP, y = f => TOP + (f-0.5)*FH;
+  const disp = c.label || name;
+  const fs = disp.length>4 ? 19 : 24;
+  let s = '<svg viewBox="0 0 122 176" xmlns="http://www.w3.org/2000/svg">';
+  s += `<text x="61" y="30" fill="#f0b429" font-size="${fs}" font-weight="800" text-anchor="middle" font-family="Georgia,serif">${disp}</text>`;
+  for(let r=0;r<=NF;r++){
+    const yy = TOP + r*FH, nut = (r===0 && base===1);
+    s += `<line x1="${L}" y1="${yy}" x2="${x(5)}" y2="${yy}" stroke="${nut?'#cdb890':'#4a4038'}" stroke-width="${nut?3:1}" stroke-linecap="round"/>`;
+  }
+  for(let i=0;i<6;i++)
+    s += `<line x1="${x(i)}" y1="${TOP}" x2="${x(i)}" y2="${TOP+NF*FH}" stroke="#5f5347" stroke-width="1"/>`;
+  if(base>1) s += `<text x="${L-6}" y="${y(1)+4}" fill="#8a8078" font-size="10" text-anchor="end">${base}</text>`;
+  if(c.barre && c.barre.fret>=base && c.barre.fret<base+NF){
+    const rf = c.barre.fret-base+1;
+    s += `<rect x="${x(c.barre.from)-6}" y="${y(rf)-6}" width="${x(c.barre.to)-x(c.barre.from)+12}" height="12" rx="6" fill="#f0b429"/>`;
+  }
+  for(let i=0;i<6;i++){
+    const f = c.f[i];
+    if(f===-1) s += `<text x="${x(i)}" y="${TOP-6}" fill="#8a8078" font-size="11" text-anchor="middle">×</text>`;
+    else if(f===0) s += `<circle cx="${x(i)}" cy="${TOP-10}" r="4" fill="none" stroke="#d8cbb4" stroke-width="1.4"/>`;
+    else{
+      const rf = f-base+1; if(rf<1||rf>NF) continue;
+      const onBarre = c.barre && c.barre.fret===f && i>=c.barre.from && i<=c.barre.to;
+      if(!onBarre) s += `<circle cx="${x(i)}" cy="${y(rf)}" r="7.5" fill="#f0b429"/>`;
+      if(c.g[i]>0) s += `<text x="${x(i)}" y="${y(rf)+3.6}" fill="#1a1408" font-size="9.5" font-weight="700" text-anchor="middle">${c.g[i]}</text>`;
+    }
+  }
+  return s+'</svg>';
+}
+
+/* ================= СЪСТОЯНИЕ ================= */
+let cur = null, bpm = 60, playing = false, bar = 0, slot = 0;
+const $ = id => document.getElementById(id);
+
+/* ================= ЗВУК: истински мостри на акустична китара =================
+   Никакъв синтез. Всяка нота е реален запис на стоманена акустична китара
+   (tonejs-instruments / nbrosowsky, GitHub Pages, CORS отворен).
+
+   • Базата са 6-те отворени струни E2 A2 D3 G3 B3 E4 — зареждат се първи,
+     за да може да се свири веднага.
+   • playbackRate = Math.pow(2, fret/12) спрямо праговете в масива f.
+   • Във фонов режим се дозареждат и междинните ноти; щом пристигнат,
+     двигателят взима най-близката мостра и транспонирането пада под 1 полутон
+     (по-малко транспониране = по-малко изкривяване на дървения тембър). */
+
+const SMP_HOSTS = [
+  'https://nbrosowsky.github.io/tonejs-instruments/samples/guitar-acoustic/',
+  'https://raw.githubusercontent.com/nbrosowsky/tonejs-instruments/master/samples/guitar-acoustic/'
+];
+
+const OPEN = [40,45,50,55,59,64];            // MIDI на празните струни (E2 A2 D3 G3 B3 E4)
+
+// Шестте отворени струни — задължителни
+const CORE_SMP = { 'E2':40, 'A2':45, 'D3':50, 'G3':55, 'B3':59, 'E4':64 };
+// Останалите ноти в обхвата на акордите — по избор, само подобряват качеството
+const EXTRA_SMP = {
+  'F2':41,'Fs2':42,'G2':43,'Gs2':44,'As2':46,'B2':47,
+  'C3':48,'Cs3':49,'Ds3':51,'E3':52,'F3':53,'Fs3':54,'Gs3':56,'A3':57,'As3':58,
+  'C4':60,'Cs4':61,'D4':62,'F4':65,'Fs4':66,'G4':67,'Gs4':68
+};
+
+let ac=null, master=null, dryBus=null, active=[];
+const smp = new Map();                        // midi → AudioBuffer
+let coreReady = false, loadFailed = false, loadingCore = null;
+
+function initAudio(){
+  if(ac) return;
+  // iOS 16.4+: без това Web Audio мълчи, когато страничният ключ е на безшумен режим
+  try{ if(navigator.audioSession) navigator.audioSession.type = 'playback'; }catch(e){}
+  ac = new (window.AudioContext||window.webkitAudioContext)();
+
+  const out = ac.createDynamicsCompressor();
+  out.threshold.value=-12; out.knee.value=18; out.ratio.value=2.6;
+  out.attack.value=0.008; out.release.value=0.3;
+  out.connect(ac.destination);
+
+  master = ac.createGain(); master.gain.value = 0.9; master.connect(out);
+
+  // мострите вече носят звука на дървото — само лек цъфтеж въздух в стаята
+  dryBus = ac.createGain(); dryBus.gain.value = 1.0; dryBus.connect(master);
+  const send = ac.createGain(); send.gain.value = 0.12; dryBus.connect(send);
+  const verb = ac.createConvolver(); verb.buffer = roomIR(1.3, 3.0, 0.45);
+  send.connect(verb); verb.connect(master);
+}
+
+function roomIR(dur, decay, dampC){
+  const sr = ac.sampleRate, len = Math.floor(sr*dur);
+  const b = ac.createBuffer(2, len, sr);
+  for(let ch=0; ch<2; ch++){
+    const d = b.getChannelData(ch); let a=0, c=0;
+    for(let i=0;i<len;i++){
+      const n = (Math.random()*2-1)*Math.pow(1-i/len, decay);
+      a = a*dampC + n*(1-dampC);
+      c = c*dampC + a*(1-dampC);
+      d[i] = c;
+    }
+    const pre = Math.floor(sr*0.015);
+    for(let i=0;i<pre;i++) d[i] *= i/pre;
+  }
+  return b;
+}
+
+/* ---------- зареждане на мострите ---------- */
+async function fetchSample(file){
+  for(const host of SMP_HOSTS){
+    try{
+      const r = await fetch(host + file + '.mp3', {mode:'cors'});
+      if(!r.ok) continue;
+      return await ac.decodeAudioData(await r.arrayBuffer());
+    }catch(e){ /* пробваме следващия хост */ }
+  }
+  return null;
+}
+
+function loadSet(map){
+  return Promise.all(Object.entries(map).map(async ([file, midi])=>{
+    const buf = await fetchSample(file);
+    if(buf) smp.set(midi, buf);
+    return !!buf;
+  }));
+}
+
+function loadCore(){
+  if(loadingCore) return loadingCore;
+  initAudio();
+  loadingCore = loadSet(CORE_SMP).then(res=>{
+    coreReady = res.some(Boolean);
+    loadFailed = !coreReady;
+    if(coreReady) loadSet(EXTRA_SMP);       // останалите — тихо, във фонов режим
+    return coreReady;
+  });
+  return loadingCore;
+}
+
+/* ---------- избор на мостра ---------- */
+/* Точната нота, ако е налична (без транспониране). Иначе най-близката в рамките
+   на 2 полутона. Ако има само отворените струни — мострата на самата струна,
+   транспонирана точно с 2^(праг/12). */
+function pickSample(midi, openMidi){
+  if(smp.has(midi)) return {buf:smp.get(midi), midi:midi};
+  for(let d=1; d<=2; d++){
+    if(smp.has(midi-d)) return {buf:smp.get(midi-d), midi:midi-d};
+    if(smp.has(midi+d)) return {buf:smp.get(midi+d), midi:midi+d};
+  }
+  if(smp.has(openMidi)) return {buf:smp.get(openMidi), midi:openMidi};
+  let best=null, bd=99;
+  smp.forEach((b,m)=>{ const dd=Math.abs(m-midi); if(dd<bd){bd=dd; best={buf:b, midi:m};} });
+  return best;
+}
+
+function playString(t, midi, openMidi, gain){
+  const s = pickSample(midi, openMidi);
+  if(!s) return;
+  const src = ac.createBufferSource();
+  src.buffer = s.buf;
+  // ключовата формула: транспониране спрямо прага
+  src.playbackRate.value = Math.pow(2, (midi - s.midi)/12) * (1 + (Math.random()-0.5)*0.0012);
+  const g = ac.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.linearRampToValueAtTime(gain, t+0.004);
+  src.connect(g); g.connect(dryBus);
+  src.start(t);
+  const node = {g:g, target:gain, end:t + s.buf.duration/src.playbackRate.value};
+  active.push(node);
+  src.onended = ()=>{ const i=active.indexOf(node); if(i>=0) active.splice(i,1); };
+}
+
+/* Заглушаване на звънящите струни при смяна на акорд.
+   setTargetAtTime тръгва точно от стойността в момент t и се приближава
+   експоненциално към целта — както дланта ляга върху струните, без пукане. */
+function mute(t, amount, tau){
+  active.forEach(n=>{
+    if(n.end > t){
+      n.target = Math.max(0.00005, n.target*amount);
+      try{
+        n.g.gain.cancelScheduledValues(t);
+        n.g.gain.setTargetAtTime(n.target, t, tau);
+      }catch(e){}
+    }
+  });
+}
+
+let lastChord = null;
+function strum(t, name, dir, accent){
+  name = A(name);
+  const c = CHORDS[name]; if(!c || !coreReady) return;
+  if(lastChord !== null) lastChord===name ? mute(t,0.55,0.045) : mute(t,0.18,0.030);
+  lastChord = name;
+
+  const idx=[]; for(let i=0;i<6;i++) if(c.f[i]>=0) idx.push(i);
+  const order = dir==='U' ? idx.slice().reverse() : idx;             // надолу от басите, нагоре от високите
+  const spread = (dir==='U' ? 0.0105 : 0.016) * (accent?0.88:1) * (0.92+Math.random()*0.16);
+  const base = (dir==='U' ? 0.42 : 0.55) * (accent?1.14:1);
+  order.forEach((s,k)=>{
+    const tilt = dir==='U' ? (1-k*0.10) : (1-k*0.06);
+    playString(t + k*spread + Math.random()*0.0012,
+               OPEN[s] + c.f[s], OPEN[s],
+               Math.max(0.06, base*tilt*(0.93+Math.random()*0.14)));
+  });
+}
+
+function click(t, accent){
+  const o = ac.createOscillator(), g = ac.createGain(), f = ac.createBiquadFilter();
+  o.type='sine'; o.frequency.value = accent?1500:1000;
+  f.type='bandpass'; f.frequency.value = accent?1500:1000; f.Q.value=1.2;
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.exponentialRampToValueAtTime(accent?0.20:0.10,t+0.001);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+0.05);
+  o.connect(f); f.connect(g); g.connect(master); o.start(t); o.stop(t+0.07);
+}
+
+function prewarm(){ /* мострите се кешират глобално — няма какво да се подгрява */ }
+
+/* ================= UI ================= */
+function buildSelect(){
+  const sel = $('songSel');
+  let html='', last='';
+  LIST.forEach((s,i)=>{
+    if(s.grp!==last){ if(last) html+='</optgroup>'; html+=`<optgroup label="${s.grp}">`; last=s.grp; }
+    html += `<option value="${i}">${s.n}</option>`;
+  });
+  sel.innerHTML = html+'</optgroup>';
+  sel.onchange = e => load(+e.target.value);
+}
+
+function load(i){
+  stop();
+  cur = JSON.parse(JSON.stringify(LIST[i]));
+  bpm = cur.b; $('bpm').value = bpm; $('bpmVal').textContent = bpm;
+  bar = 0; slot = 0;
+  $('title').textContent = cur.n;
+  renderAnchorBtn(); renderDots(); renderChords(); renderStrum();
+  if(ac) setTimeout(prewarm, 20);
+}
+
+/* --- Anchor chords: пръсти 3 и 4 остават на място между акордите --- */
+function anchorable(){ return cur ? cur.c.some(n=>ANCHOR[n]) : false; }
+
+function renderAnchorBtn(){
+  const b = $('anchorBtn'), ok = anchorable();
+  b.className = 'anchor' + (ok ? (anchorOn?' on':'') : ' dis');
+  b.textContent = ok ? (anchorOn ? '⚓ Anchored chords ON' : '⚓ Anchor chords')
+                     : '⚓ Няма anchor версия';
+}
+
+$('anchorBtn').onclick = ()=>{
+  if(!anchorable()) return;
+  anchorOn = !anchorOn;
+  renderAnchorBtn(); renderChords();
+  lastChord = null;
+  if(ac) prewarm();
+};
+
+function renderDots(){ $('dots').innerHTML = cur.c.map((_,i)=>`<div class="dot ${i===bar?'on':''}"></div>`).join(''); }
+function renderChords(){
+  const n = cur.c.length;
+  const cell=(name,cls)=>`<div class="slot ${cls}"><div class="frame">${chordSVG(A(name))}</div></div>`;
+  $('chords').innerHTML = cell(cur.c[(bar-1+n)%n],'side')+cell(cur.c[bar],'center')+cell(cur.c[(bar+1)%n],'side');
+}
+function renderStrum(){
+  $('strum').innerHTML = cur.p.map((v,i)=>`<div class="beat ${v!=='-'?'act':''}" data-i="${i}">${v==='U'?'↑':'↓'}</div>`).join('');
+  document.querySelectorAll('.beat').forEach(el=>{
+    el.onclick = ()=>{ const i=+el.dataset.i, v=cur.p[i];
+      cur.p[i] = v==='-' ? (i%2===0?'D':'U') : (v==='D'?'U':'-'); renderStrum(); };
+  });
+}
+function highlight(){
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('on', i===bar));
+}
+
+/* ================= ТАЙМИНГ ================= */
+let nextTime=0, timer=null, queue=[], countIn=0, lastBar=-1;
+const LOOKAHEAD=0.15, TICK=25;
+
+function schedule(){
+  while(nextTime < ac.currentTime + LOOKAHEAD){
+    if(countIn > 0){
+      click(nextTime, true);
+      queue.push({t:nextTime, cnt:countIn});
+      countIn--;
+      nextTime += 60/bpm;                       // отброяване по четвъртини
+    } else {
+      if(slot%2===0) click(nextTime, slot===0);
+      const v = cur.p[slot];
+      if(v!=='-') strum(nextTime, cur.c[bar], v, slot===0);
+      queue.push({t:nextTime, bar:bar, slot:slot});
+      nextTime += (60/bpm)/2;
+      slot++;
+      if(slot>=8){ slot=0; bar=(bar+1)%cur.c.length; }
+    }
+  }
+}
+
+function draw(){
+  if(!playing) return;
+  const now = ac.currentTime;
+  let ev = null;
+  while(queue.length && queue[0].t <= now+0.02) ev = queue.shift();
+  if(ev){
+    if(ev.cnt !== undefined){
+      $('play').textContent = ev.cnt;
+      $('play').className = 'play cnt';
+      document.querySelectorAll('.beat').forEach(el=>el.classList.remove('hit','rest'));
+    } else {
+      const p = $('play');
+      if(p.className!=='play on'){ p.className='play on'; p.textContent='■ Stop'; }
+      if(ev.bar !== lastBar){ lastBar = ev.bar; bar = ev.bar; renderChords(); highlight(); }
+      document.querySelectorAll('.beat').forEach((el,i)=>{
+        el.classList.toggle('hit', i===ev.slot);
+        el.classList.toggle('rest', i===ev.slot && cur.p[i]==='-');
+      });
+    }
+  }
+  requestAnimationFrame(draw);
+}
+
+let starting = false;
+function start(){
+  initAudio();
+  if(ac.state==='suspended') ac.resume();
+
+  // мострите трябва да са в паметта, преди да тръгне метрономът
+  if(!coreReady){
+    if(starting) return;
+    starting = true;
+    const b = $('play');
+    b.className = 'play'; b.textContent = '⏳ Зареждам китарата…';
+    loadCore().then(ok=>{
+      starting = false;
+      if(!ok){ b.textContent = '⚠ Няма връзка към мострите'; return; }
+      start();
+    });
+    return;
+  }
+
+  keepAwake(true);
+  playing = true;
+  bar=0; slot=0; queue=[]; lastBar=-1; lastChord=null; active=[];
+  countIn = 3;                                   // 3 · 2 · 1 и тръгва
+  nextTime = ac.currentTime + 0.25;
+  $('play').textContent = '3'; $('play').className='play cnt';
+  timer = setInterval(schedule, TICK);
+  requestAnimationFrame(draw);
+}
+
+/* Екранът не заспива, докато свириш (iOS 16.4+, Android Chrome) */
+let wakeLock = null;
+async function keepAwake(on){
+  try{
+    if(on){ if(!wakeLock && navigator.wakeLock) wakeLock = await navigator.wakeLock.request('screen'); }
+    else if(wakeLock){ await wakeLock.release(); wakeLock = null; }
+  }catch(e){}
+}
+document.addEventListener('visibilitychange', ()=>{
+  if(document.visibilityState==='visible' && playing) keepAwake(true);
+});
+
+function stop(){
+  keepAwake(false);
+  playing = false;
+  if(timer) clearInterval(timer);
+  timer=null; queue=[]; lastChord=null;
+  if(ac) mute(ac.currentTime, 0.015, 0.07);
+  const p = $('play'); if(p){ p.className='play'; p.textContent='▶ Play'; }
+  document.querySelectorAll('.beat').forEach(el=>el.classList.remove('hit','rest'));
+  bar = 0; if(cur){ renderChords(); highlight(); }
+}
+
+/* ================= КОНТРОЛИ ================= */
+$('play').onclick = ()=> playing ? stop() : start();
+$('bpm').oninput = e => { bpm=+e.target.value; $('bpmVal').textContent=bpm; };
+document.querySelectorAll('.presets button').forEach(b=>{
+  b.onclick = ()=>{ bpm=+b.dataset.b; $('bpm').value=bpm; $('bpmVal').textContent=bpm; };
+});
+document.addEventListener('keydown', e=>{
+  if(e.target.tagName==='SELECT') return;
+  if(e.code==='Space'){ e.preventDefault(); playing?stop():start(); }
+  if(e.code==='ArrowUp'){ e.preventDefault(); bpm=Math.min(200,bpm+5); $('bpm').value=bpm; $('bpmVal').textContent=bpm; }
+  if(e.code==='ArrowDown'){ e.preventDefault(); bpm=Math.max(35,bpm-5); $('bpm').value=bpm; $('bpmVal').textContent=bpm; }
+});
+
+buildSelect();
+load(0);
+
+// мострите тръгват да се теглят веднага при отваряне, за да е Play моментален
+setTimeout(()=>{ try{ loadCore(); }catch(e){} }, 200);
+
+// офлайн режим (работи само по https, т.е. на GitHub Pages — не при отваряне от диска)
+if('serviceWorker' in navigator)
+  window.addEventListener('load', ()=> navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+</body>
+</html>

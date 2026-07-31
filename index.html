@@ -12,10 +12,19 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" type="image/png" href="icon-180.png">
 <link rel="manifest" href="manifest.json">
+<!-- splash екрани, за да не мигва бял/празен екран при отваряне от началния екран -->
+<link rel="apple-touch-startup-image" href="splash-1290x2796.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash-1179x2556.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash-1170x2532.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash-1125x2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash-828x1792.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+<link rel="apple-touch-startup-image" href="splash-1170x2532.png">
 <title>Guitar Practice</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--gold:#29f093;--gold-d:#1ab86e;--txt:#eeeeee;--muted:#737373;--line:#1e1e1e}
+:root{--gold:#29f093;--gold-d:#1ab86e;--txt:#eeeeee;--muted:#737373;--line:#1e1e1e;
+ --r-sm:10px;--r-md:14px;--r-lg:20px;--r-xl:26px}
 html,body{height:100%;background:#060606}
 body{color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,sans-serif;
  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;-webkit-tap-highlight-color:transparent;
@@ -50,7 +59,7 @@ button,select,.beat,input[type=range]{touch-action:manipulation;font-family:inhe
  padding-right:30px;transition:opacity .25s}
 .pickHint{display:flex;align-items:center;gap:6px;margin-top:10px;font-size:11.5px;letter-spacing:.3px;color:#666666}
 .pickHint b{color:var(--gold-d);font-weight:600}
-.chev{position:absolute;right:0;top:26px;width:30px;height:30px;border-radius:10px;
+.chev{position:absolute;right:0;top:26px;width:30px;height:30px;border-radius:var(--r-sm);
  background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.06);
  display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:10px;transition:background .18s}
 .pick select{position:absolute;inset:-8px -6px;width:calc(100% + 12px);opacity:0;appearance:none;-webkit-appearance:none;
@@ -60,7 +69,7 @@ button,select,.beat,input[type=range]{touch-action:manipulation;font-family:inhe
 /* ---------- anchor pill ---------- */
 .anchorWrap{display:flex;flex:none}
 .anchor{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
- background:linear-gradient(180deg,#171717,#111111);border:1px solid #2a2a2a;color:#bcbcbc;border-radius:14px;
+ background:linear-gradient(180deg,#171717,#111111);border:1px solid #2a2a2a;border-top-color:#3a3a3a;color:#bcbcbc;border-radius:var(--r-md);
  padding:13px 18px;font-size:13.5px;font-weight:600;letter-spacing:.2px;cursor:pointer;
  box-shadow:0 4px 12px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.045);
  transition:transform .12s,box-shadow .2s,border-color .2s,color .2s,background .25s}
@@ -71,8 +80,8 @@ button,select,.beat,input[type=range]{touch-action:manipulation;font-family:inhe
 
 /* ---------- cards ---------- */
 .card{background:linear-gradient(178deg,#121212 0%,#0e0e0e 55%,#0a0a0a 100%);
- border:1px solid var(--line);border-radius:22px;padding:16px 16px 18px;
- box-shadow:0 18px 34px -20px rgba(0,0,0,.9),0 1px 0 rgba(255,255,255,.035) inset}
+ border:1px solid var(--line);border-top-color:rgba(255,255,255,.08);border-radius:var(--r-lg);padding:16px 16px 18px;
+ box-shadow:0 18px 34px -20px rgba(0,0,0,.9),0 1px 0 rgba(255,255,255,.05) inset}
 .cardHead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:12px}
 .label{font-size:9.5px;font-weight:700;letter-spacing:2.4px;color:#626262}
 .fine{font-size:10px;letter-spacing:.5px;color:#535353;font-variant-numeric:tabular-nums}
@@ -92,7 +101,7 @@ button,select,.beat,input[type=range]{touch-action:manipulation;font-family:inhe
 .chords{display:flex;align-items:center;justify-content:center;gap:2px;min-height:216px;perspective:1000px;position:relative}
 .slot{flex:0 0 auto;position:relative;padding-bottom:20px;transform-style:preserve-3d}
 .slot svg{display:block;width:84px;height:auto}
-.frame{border:1px solid #242424;border-radius:13px;padding:0 7px 7px;
+.frame{border:1px solid #242424;border-top-color:#333333;border-radius:var(--r-md);padding:0 7px 7px;
  background:linear-gradient(176deg,#252525 0%,#161616 46%,#0e0e0e 100%);
  box-shadow:0 10px 22px -12px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.05)}
 .slot.side{opacity:.42;filter:grayscale(.5) brightness(.72);animation:sIn .45s ease-out both}
@@ -103,7 +112,7 @@ button,select,.beat,input[type=range]{touch-action:manipulation;font-family:inhe
 .slot.side:last-child::after{content:"СЛЕДВАЩ"}
 .slot.center{opacity:1;z-index:2;margin:0 2px;animation:cIn .42s cubic-bezier(.18,.9,.2,1) both}
 .slot.center svg{width:150px}
-.slot.center .frame{border:1.5px solid rgba(41,240,147,.72);border-radius:16px;padding:0 10px 10px;
+.slot.center .frame{border:1.5px solid rgba(41,240,147,.72);border-radius:var(--r-md);padding:0 10px 10px;
  background:linear-gradient(176deg,#193d2c 0%,#12221b 48%,#101412 100%);
  box-shadow:0 0 0 6px rgba(41,240,147,.045),0 0 40px rgba(41,240,147,.16),0 22px 34px -16px rgba(0,0,0,.95),
  inset 0 1px 0 rgba(130,255,197,.22),inset 0 -20px 40px rgba(0,0,0,.35)}
@@ -114,7 +123,7 @@ button,select,.beat,input[type=range]{touch-action:manipulation;font-family:inhe
 
 /* ---------- strumming ---------- */
 .strum{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
-.beat{aspect-ratio:1/1;border:1px solid #202020;border-radius:12px;display:flex;align-items:center;justify-content:center;
+.beat{aspect-ratio:1/1;border:1px solid #202020;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;
  font-size:17px;color:#343434;background:linear-gradient(180deg,#121212,#0c0c0c);cursor:pointer;user-select:none;
  box-shadow:inset 0 1px 0 rgba(255,255,255,.03),0 2px 6px rgba(0,0,0,.4);
  transition:color .18s,border-color .18s,background .18s}
@@ -150,7 +159,7 @@ button,select,.beat,input[type=range]{touch-action:manipulation;font-family:inhe
 .fader input[type=range]{position:absolute;left:0;right:0;top:6px;width:100%;height:42px;margin:0;background:transparent;
  -webkit-appearance:none;appearance:none;outline:none}
 .fader input[type=range]::-webkit-slider-runnable-track{height:42px;background:transparent}
-.fader input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:40px;border-radius:9px;
+.fader input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:40px;border-radius:var(--r-sm);
  background:linear-gradient(180deg,#505050 0%,#242424 44%,#373737 100%);border:1px solid #5f5f5f;
  background-image:linear-gradient(180deg,#505050 0%,#242424 44%,#373737 100%),linear-gradient(var(--gold),var(--gold));
  background-size:100% 100%,2px 15px;background-position:0 0,center;background-repeat:no-repeat;
@@ -158,21 +167,25 @@ button,select,.beat,input[type=range]{touch-action:manipulation;font-family:inhe
 .fader input[type=range]:active::-webkit-slider-thumb{cursor:grabbing;
  box-shadow:0 3px 8px rgba(0,0,0,.7),0 0 18px rgba(41,240,147,.28),0 1px 0 rgba(255,255,255,.16) inset}
 .fader input[type=range]::-moz-range-track{height:42px;background:transparent}
-.fader input[type=range]::-moz-range-thumb{width:24px;height:38px;border-radius:9px;border:1px solid #5f5f5f;
+.fader input[type=range]::-moz-range-thumb{width:24px;height:38px;border-radius:var(--r-sm);border:1px solid #5f5f5f;
  background:linear-gradient(180deg,#505050,#242424 44%,#373737);cursor:grab}
 
 .presets{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
-.presets button{background:linear-gradient(180deg,#161616,#101010);border:1px solid #242424;color:#aeaeae;
- border-radius:12px;padding:11px 0;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;cursor:pointer;
+.presets button{background:linear-gradient(180deg,#161616,#101010);border:1px solid #242424;border-top-color:#323232;color:#aeaeae;
+ border-radius:var(--r-md);padding:11px 0;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;cursor:pointer;
  box-shadow:0 3px 8px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.04);transition:transform .1s,color .18s,border-color .18s}
 .presets button:active{transform:translateY(1px) scale(.98);color:var(--gold);border-color:#1c4a35;
  box-shadow:inset 0 2px 6px rgba(0,0,0,.6)}
 
-.play{width:100%;margin-top:14px;border:0;border-radius:17px;padding:19px;font-size:17px;font-weight:700;
+.play{width:100%;margin-top:14px;border:0;border-radius:var(--r-xl);padding:19px;font-size:17px;font-weight:700;
  letter-spacing:.3px;cursor:pointer;color:#0f0f0f;font-variant-numeric:tabular-nums;
+ display:flex;align-items:center;justify-content:center;gap:9px;
  background:linear-gradient(180deg,#76ffbf 0%,var(--gold) 46%,#16d97e 100%);
  box-shadow:0 12px 26px -8px rgba(41,240,147,.42),0 2px 0 rgba(255,255,255,.25) inset,0 -3px 8px rgba(0,120,64,.35) inset;
  transition:transform .11s,box-shadow .2s,background .3s,color .2s}
+.play svg{flex:0 0 auto}
+.btnSpin{width:14px;height:14px;border-radius:50%;border:2px solid rgba(15,15,15,.28);border-top-color:currentColor;
+ animation:spin .8s linear infinite;flex:0 0 auto}
 .play:active{transform:translateY(2px) scale(.99);
  box-shadow:0 3px 10px -4px rgba(41,240,147,.3),0 -2px 6px rgba(0,120,64,.4) inset,0 3px 9px rgba(0,0,0,.45) inset}
 .play.on{background:linear-gradient(180deg,#181818,#111111);color:var(--gold);
@@ -207,10 +220,10 @@ button,select,.beat,input[type=range]{touch-action:manipulation;font-family:inhe
     <h2 id="title">—</h2>
     <div class="pickHint"><b>докосни</b> за друга песен</div>
     <select id="songSel"></select>
-    <div class="chev">▼</div>
+    <div class="chev"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div>
   </div>
 
-  <div class="anchorWrap"><button class="anchor" id="anchorBtn">⚓ Anchor chords</button></div>
+  <div class="anchorWrap"><button class="anchor" id="anchorBtn"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.6"/><line x1="12" y1="22" x2="12" y2="7.6"/><path d="M4.8 12H2a10 10 0 0 0 20 0h-2.8"/></svg><span>Anchor chords</span></button></div>
 
   <section class="card chordCard">
     <div class="cardHead"><span class="label">ПОСЛЕДОВАТЕЛНОСТ</span><span class="fine" id="fineBar">такт —/—</span></div>
@@ -237,13 +250,22 @@ button,select,.beat,input[type=range]{touch-action:manipulation;font-family:inhe
       <button data-b="40">40</button><button data-b="60">60</button>
       <button data-b="80">80</button><button data-b="100">100</button>
     </div>
-    <button class="play" id="play">▶ Play</button>
+    <button class="play" id="play"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M7.5 4.5v15l13-7.5z"/></svg><span>Play</span></button>
   </section>
 
   <div class="foot" id="foot">ПРОСВИРВАНЕ · 4/4</div>
 </div>
 
 <script>
+/* ================= ИКОНИ (замяна на emoji глифове) ================= */
+const ICONS = {
+  play:  '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M7.5 4.5v15l13-7.5z"/></svg>',
+  stop:  '<svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="3.5"/></svg>',
+  anchor:'<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.6"/><line x1="12" y1="22" x2="12" y2="7.6"/><path d="M4.8 12H2a10 10 0 0 0 20 0h-2.8"/></svg>',
+  warn:  '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>',
+  spin:  '<span class="btnSpin"></span>'
+};
+
 /* ================= АКОРДИ ================= */
 const CHORDS = {
   'C':     {f:[-1,3,2,0,1,0], g:[0,3,2,0,1,0]},
@@ -645,8 +667,8 @@ function anchorable(){ return cur ? cur.c.some(n=>ANCHOR[n]) : false; }
 function renderAnchorBtn(){
   const b = $('anchorBtn'), ok = anchorable();
   b.className = 'anchor' + (ok ? (anchorOn?' on':'') : ' dis');
-  b.textContent = ok ? (anchorOn ? '⚓ Anchored chords ON' : '⚓ Anchor chords')
-                     : '⚓ Няма anchor версия';
+  b.innerHTML = ICONS.anchor + '<span>' + (ok ? (anchorOn ? 'Anchored chords ON' : 'Anchor chords')
+                     : 'Няма anchor версия') + '</span>';
 }
 
 $('anchorBtn').onclick = ()=>{
@@ -709,7 +731,7 @@ function draw(){
       document.querySelectorAll('.beat').forEach(el=>el.classList.remove('hit','rest'));
     } else {
       const p = $('play');
-      if(p.className!=='play on'){ p.className='play on'; p.textContent='■ Stop'; }
+      if(p.className!=='play on'){ p.className='play on'; p.innerHTML = ICONS.stop + '<span>Stop</span>'; }
       if(ev.bar !== lastBar){ lastBar = ev.bar; bar = ev.bar; renderChords(); highlight(); }
       document.querySelectorAll('.beat').forEach((el,i)=>{
         el.classList.toggle('hit', i===ev.slot);
@@ -730,10 +752,10 @@ function start(){
     if(starting) return;
     starting = true;
     const b = $('play');
-    b.className = 'play'; b.textContent = '⏳ Зареждам китарата…';
+    b.className = 'play'; b.innerHTML = ICONS.spin + '<span>Зареждам китарата…</span>';
     loadCore().then(ok=>{
       starting = false;
-      if(!ok){ b.textContent = '⚠ Няма връзка към мострите'; return; }
+      if(!ok){ b.innerHTML = ICONS.warn + '<span>Няма връзка към мострите</span>'; return; }
       start();
     });
     return;
@@ -767,7 +789,7 @@ function stop(){
   if(timer) clearInterval(timer);
   timer=null; queue=[]; lastChord=null;
   if(ac) mute(ac.currentTime, 0.015, 0.07);
-  const p = $('play'); if(p){ p.className='play'; p.textContent='▶ Play'; }
+  const p = $('play'); if(p){ p.className='play'; p.innerHTML = ICONS.play + '<span>Play</span>'; }
   document.querySelectorAll('.beat').forEach(el=>el.classList.remove('hit','rest'));
   bar = 0; if(cur){ renderChords(); highlight(); }
 }

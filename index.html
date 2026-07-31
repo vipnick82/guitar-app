@@ -23,7 +23,7 @@
 <title>Guitar Practice</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--gold:#29f093;--gold-d:#1ab86e;--txt:#eeeeee;--muted:#737373;--line:#1e1e1e;
+:root{--gold:#29f093;--gold-d:#1ab86e;--blue:#22c3ff;--blue-d:#0e93c9;--txt:#eeeeee;--muted:#737373;--line:#1e1e1e;
  --r-sm:10px;--r-md:14px;--r-lg:20px;--r-xl:26px}
 html,body{height:100%;background:#060606}
 body{color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Helvetica,sans-serif;
@@ -35,31 +35,14 @@ button,select,.beat,input[type=range]{touch-action:manipulation;font-family:inhe
 .grain{position:fixed;inset:0;pointer-events:none;z-index:9;opacity:.05;mix-blend-mode:overlay;
  background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxNDAnIGhlaWdodD0nMTQwJz48ZmlsdGVyIGlkPSduJz48ZmVUdXJidWxlbmNlIHR5cGU9J2ZyYWN0YWxOb2lzZScgYmFzZUZyZXF1ZW5jeT0nLjg1JyBudW1PY3RhdmVzPSczJy8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9JzE0MCcgaGVpZ2h0PScxNDAnIGZpbHRlcj0ndXJsKCNuKScvPjwvc3ZnPg==")}
 
-.app{max-width:432px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;gap:16px;
- padding:calc(12px + env(safe-area-inset-top)) calc(22px + env(safe-area-inset-left)) calc(30px + env(safe-area-inset-bottom)) calc(22px + env(safe-area-inset-right))}
-
-/* ---------- app bar ---------- */
-.bar{display:flex;align-items:center;justify-content:space-between;height:34px;flex:none}
-.brand{display:flex;align-items:center;gap:9px;font-size:10.5px;font-weight:700;letter-spacing:2.4px;color:#666666}
-.live{width:6px;height:6px;border-radius:50%;background:#343434;box-shadow:none;transition:background .25s,box-shadow .25s}
-.app[data-playing="1"] .live{background:var(--gold);box-shadow:0 0 10px rgba(41,240,147,.8);animation:live 1.1s ease-in-out infinite}
-.chip{display:flex;align-items:center;gap:7px;font-size:10.5px;letter-spacing:.6px;color:#707070;
- background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.05);border-radius:999px;padding:5px 11px 5px 9px;
- opacity:0;transform:translateY(-3px);transition:opacity .4s,transform .4s}
-.chip.show{opacity:1;transform:none}
-.chip.ok{color:var(--gold-d)}
-.chip.err{color:#c9524a}
-.spin{width:9px;height:9px;border-radius:50%;border:1.5px solid rgba(41,240,147,.25);border-top-color:var(--gold);animation:spin .8s linear infinite}
-.chip.ok .spin,.chip.err .spin{display:none}
+.app{max-width:432px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;gap:11px;justify-content:center;
+ padding:calc(10px + env(safe-area-inset-top)) calc(22px + env(safe-area-inset-left)) calc(14px + env(safe-area-inset-bottom)) calc(22px + env(safe-area-inset-right))}
 
 /* ---------- song picker / hero ---------- */
-.pick{position:relative;padding:2px 0 4px}
-.eyebrow{font-size:9.5px;font-weight:700;letter-spacing:2.6px;color:#5b5b5b;margin-bottom:9px}
-.pick h2{font-size:27px;line-height:1.12;font-weight:700;letter-spacing:-.5px;color:#f5f5f5;text-wrap:pretty;
+.pick{position:relative;padding:3px 0 2px}
+.pick h2{font-size:26px;line-height:1.12;font-weight:700;letter-spacing:-.5px;color:#f5f5f5;text-wrap:pretty;
  padding-right:30px;transition:opacity .25s}
-.pickHint{display:flex;align-items:center;gap:6px;margin-top:10px;font-size:11.5px;letter-spacing:.3px;color:#666666}
-.pickHint b{color:var(--gold-d);font-weight:600}
-.chev{position:absolute;right:0;top:26px;width:30px;height:30px;border-radius:var(--r-sm);
+.chev{position:absolute;right:0;top:2px;width:30px;height:30px;border-radius:var(--r-sm);
  background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.06);
  display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:10px;transition:background .18s}
 .pick select{position:absolute;inset:-8px -6px;width:calc(100% + 12px);opacity:0;appearance:none;-webkit-appearance:none;
@@ -70,25 +53,25 @@ button,select,.beat,input[type=range]{touch-action:manipulation;font-family:inhe
 .anchorWrap{display:flex;flex:none}
 .anchor{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
  background:linear-gradient(180deg,#171717,#111111);border:1px solid #2a2a2a;border-top-color:#3a3a3a;color:#bcbcbc;border-radius:var(--r-md);
- padding:13px 18px;font-size:13.5px;font-weight:600;letter-spacing:.2px;cursor:pointer;
+ padding:10px 18px;font-size:13.5px;font-weight:600;letter-spacing:.2px;cursor:pointer;
  box-shadow:0 4px 12px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.045);
  transition:transform .12s,box-shadow .2s,border-color .2s,color .2s,background .25s}
 .anchor:active{transform:translateY(1px) scale(.995);box-shadow:0 1px 4px rgba(0,0,0,.5),inset 0 2px 6px rgba(0,0,0,.55)}
-.anchor.on{background:linear-gradient(180deg,#103a26,#0b2418);border-color:rgba(41,240,147,.55);color:var(--gold);
- box-shadow:0 0 26px rgba(41,240,147,.18),0 4px 14px rgba(0,0,0,.5),inset 0 1px 0 rgba(41,240,147,.22)}
+.anchor.on{background:linear-gradient(180deg,#0b2c47,#081c30);border-color:rgba(34,195,255,.55);color:var(--blue);
+ box-shadow:0 0 26px rgba(34,195,255,.18),0 4px 14px rgba(0,0,0,.5),inset 0 1px 0 rgba(34,195,255,.22)}
 .anchor.dis{opacity:.32;cursor:default;box-shadow:none}
 
 /* ---------- cards ---------- */
 .card{background:linear-gradient(178deg,#121212 0%,#0e0e0e 55%,#0a0a0a 100%);
- border:1px solid var(--line);border-top-color:rgba(255,255,255,.08);border-radius:var(--r-lg);padding:16px 16px 18px;
+ border:1px solid var(--line);border-top-color:rgba(255,255,255,.08);border-radius:var(--r-lg);padding:13px 14px 15px;
  box-shadow:0 18px 34px -20px rgba(0,0,0,.9),0 1px 0 rgba(255,255,255,.05) inset}
-.cardHead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:12px}
+.cardHead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:8px}
 .label{font-size:9.5px;font-weight:700;letter-spacing:2.4px;color:#626262}
 .fine{font-size:10px;letter-spacing:.5px;color:#535353;font-variant-numeric:tabular-nums}
 .fine b{color:var(--gold-d);font-weight:600}
 
 /* ---------- bar dots ---------- */
-.dots{display:flex;gap:5px;justify-content:center;margin-bottom:14px;flex-wrap:wrap}
+.dots{display:flex;gap:5px;justify-content:center;margin-bottom:8px;flex-wrap:wrap}
 .dot{width:6px;height:6px;border-radius:3px;background:#2e2e2e;transition:width .3s cubic-bezier(.2,.85,.2,1),background .25s,box-shadow .25s}
 .dot.on{background:var(--gold);width:26px;box-shadow:0 0 12px rgba(41,240,147,.5)}
 
@@ -98,9 +81,9 @@ button,select,.beat,input[type=range]{touch-action:manipulation;font-family:inhe
  pointer-events:none;opacity:0;background:radial-gradient(circle,rgba(41,240,147,.16),rgba(41,240,147,0) 68%)}
 .app.pulse .pulseRing{animation:ring .46s ease-out}
 .app.pulse.accent .pulseRing{animation:ring .6s ease-out}
-.chords{display:flex;align-items:center;justify-content:center;gap:2px;min-height:216px;perspective:1000px;position:relative}
+.chords{display:flex;align-items:center;justify-content:center;gap:2px;min-height:168px;perspective:1000px;position:relative}
 .slot{flex:0 0 auto;position:relative;padding-bottom:20px;transform-style:preserve-3d}
-.slot svg{display:block;width:84px;height:auto}
+.slot svg{display:block;width:70px;height:auto}
 .frame{border:1px solid #242424;border-top-color:#333333;border-radius:var(--r-md);padding:0 7px 7px;
  background:linear-gradient(176deg,#252525 0%,#161616 46%,#0e0e0e 100%);
  box-shadow:0 10px 22px -12px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.05)}
@@ -111,7 +94,7 @@ button,select,.beat,input[type=range]{touch-action:manipulation;font-family:inhe
 .slot.side:first-child::after{content:"ПРЕДИШЕН"}
 .slot.side:last-child::after{content:"СЛЕДВАЩ"}
 .slot.center{opacity:1;z-index:2;margin:0 2px;animation:cIn .42s cubic-bezier(.18,.9,.2,1) both}
-.slot.center svg{width:150px}
+.slot.center svg{width:126px}
 .slot.center .frame{border:1.5px solid rgba(41,240,147,.72);border-radius:var(--r-md);padding:0 10px 10px;
  background:linear-gradient(176deg,#193d2c 0%,#12221b 48%,#101412 100%);
  box-shadow:0 0 0 6px rgba(41,240,147,.045),0 0 40px rgba(41,240,147,.16),0 22px 34px -16px rgba(0,0,0,.95),
@@ -121,19 +104,26 @@ button,select,.beat,input[type=range]{touch-action:manipulation;font-family:inhe
 .app.flat .slot.side:first-child{transform:scale(.9)}
 .app.flat .slot.side:last-child{transform:scale(.9)}
 
+/* ---------- anchor chords: синьо неоново състояние на централния акорд ---------- */
+.app.anchorActive .slot.center .frame{border-color:rgba(34,195,255,.72);
+ background:linear-gradient(176deg,#0e2f42 0%,#0b1f2c 48%,#0a1416 100%);
+ box-shadow:0 0 0 6px rgba(34,195,255,.045),0 0 40px rgba(34,195,255,.16),0 22px 34px -16px rgba(0,0,0,.95),
+ inset 0 1px 0 rgba(140,225,255,.22),inset 0 -20px 40px rgba(0,0,0,.35)}
+.app.anchorActive .slot.center::after{color:var(--blue-d)}
+.app.anchorActive .pulseRing{background:radial-gradient(circle,rgba(34,195,255,.16),rgba(34,195,255,0) 68%)}
+
 /* ---------- strumming ---------- */
 .strum{display:grid;grid-template-columns:repeat(8,1fr);gap:6px}
 .beat{aspect-ratio:1/1;border:1px solid #202020;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;
- font-size:17px;color:#343434;background:linear-gradient(180deg,#121212,#0c0c0c);cursor:pointer;user-select:none;
+ font-size:17px;color:#343434;background:linear-gradient(180deg,#121212,#0c0c0c);cursor:default;user-select:none;
  box-shadow:inset 0 1px 0 rgba(255,255,255,.03),0 2px 6px rgba(0,0,0,.4);
  transition:color .18s,border-color .18s,background .18s}
-.beat:active{transform:translateY(1px)}
 .beat.act{color:rgba(41,240,147,.85);border-color:#13462e;background:linear-gradient(180deg,#101d17,#09140f)}
 .beat.hit{color:#0f0f0f;border-color:var(--gold);background:linear-gradient(180deg,#69ffb9,var(--gold));
  animation:hit .32s cubic-bezier(.2,.85,.2,1)}
 .beat.hit.rest{color:#747474;border-color:#343434;background:linear-gradient(180deg,#262626,#1a1a1a);
  animation:hitRest .3s ease-out}
-.counts{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-top:9px}
+.counts{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-top:6px}
 .counts span{text-align:center;font-size:9.5px;letter-spacing:.4px;color:#454545;font-variant-numeric:tabular-nums;transition:color .15s}
 .counts span.n{color:#626262}
 .app[data-slot="0"] .counts span:nth-child(1),.app[data-slot="1"] .counts span:nth-child(2),
@@ -145,39 +135,44 @@ button,select,.beat,input[type=range]{touch-action:manipulation;font-family:inhe
 /* ---------- transport ---------- */
 .bpmRow{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2px}
 .bpmNum{display:flex;align-items:baseline;gap:6px}
-.bpmNum span{font-size:34px;font-weight:700;letter-spacing:-1.2px;color:#f5f5f5;font-variant-numeric:tabular-nums;line-height:1}
+.bpmNum span{font-size:28px;font-weight:700;letter-spacing:-1.2px;color:#f5f5f5;font-variant-numeric:tabular-nums;line-height:1}
 .bpmNum i{font-style:normal;font-size:10px;font-weight:700;letter-spacing:1.8px;color:#626262}
-.fader{position:relative;height:52px;margin:6px 0 2px}
-.faderTrack{position:absolute;left:2px;right:2px;top:22px;height:9px;border-radius:6px;
+.bpmReset{align-self:center;margin-left:2px;width:22px;height:22px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;
+ border-radius:50%;border:1px solid #292929;background:rgba(255,255,255,.04);color:#8a8a8a;cursor:pointer;
+ opacity:0;pointer-events:none;transform:scale(.85);transition:opacity .2s,transform .2s,color .2s,border-color .2s}
+.bpmReset.show{opacity:1;pointer-events:auto;transform:scale(1)}
+.bpmReset:active{transform:scale(.88)}
+.fader{position:relative;height:44px;margin:5px 0 2px}
+.faderTrack{position:absolute;left:2px;right:2px;top:18px;height:9px;border-radius:6px;
  background:linear-gradient(180deg,#070707,#141414);box-shadow:inset 0 2px 5px rgba(0,0,0,.9),0 1px 0 rgba(255,255,255,.04)}
 .faderFill{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:6px;
  background:linear-gradient(180deg,#69ffb9,var(--gold-d));box-shadow:0 0 14px rgba(41,240,147,.35)}
-.ticks{position:absolute;left:2px;right:2px;top:38px;height:7px;
+.ticks{position:absolute;left:2px;right:2px;top:32px;height:7px;
  background-image:repeating-linear-gradient(90deg,#2b2b2b 0 1px,transparent 1px 12.5%)}
 .faderEnds{position:absolute;left:2px;right:2px;top:0;display:flex;justify-content:space-between;
  font-size:9px;letter-spacing:1.2px;color:#454545}
-.fader input[type=range]{position:absolute;left:0;right:0;top:6px;width:100%;height:42px;margin:0;background:transparent;
+.fader input[type=range]{position:absolute;left:0;right:0;top:2px;width:100%;height:36px;margin:0;background:transparent;
  -webkit-appearance:none;appearance:none;outline:none}
-.fader input[type=range]::-webkit-slider-runnable-track{height:42px;background:transparent}
-.fader input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:40px;border-radius:var(--r-sm);
+.fader input[type=range]::-webkit-slider-runnable-track{height:36px;background:transparent}
+.fader input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:34px;border-radius:var(--r-sm);
  background:linear-gradient(180deg,#505050 0%,#242424 44%,#373737 100%);border:1px solid #5f5f5f;
  background-image:linear-gradient(180deg,#505050 0%,#242424 44%,#373737 100%),linear-gradient(var(--gold),var(--gold));
  background-size:100% 100%,2px 15px;background-position:0 0,center;background-repeat:no-repeat;
  box-shadow:0 8px 16px rgba(0,0,0,.7),0 1px 0 rgba(255,255,255,.22) inset,0 -2px 4px rgba(0,0,0,.5) inset;cursor:grab}
 .fader input[type=range]:active::-webkit-slider-thumb{cursor:grabbing;
  box-shadow:0 3px 8px rgba(0,0,0,.7),0 0 18px rgba(41,240,147,.28),0 1px 0 rgba(255,255,255,.16) inset}
-.fader input[type=range]::-moz-range-track{height:42px;background:transparent}
-.fader input[type=range]::-moz-range-thumb{width:24px;height:38px;border-radius:var(--r-sm);border:1px solid #5f5f5f;
+.fader input[type=range]::-moz-range-track{height:36px;background:transparent}
+.fader input[type=range]::-moz-range-thumb{width:22px;height:32px;border-radius:var(--r-sm);border:1px solid #5f5f5f;
  background:linear-gradient(180deg,#505050,#242424 44%,#373737);cursor:grab}
 
-.presets{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.presets{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:9px}
 .presets button{background:linear-gradient(180deg,#161616,#101010);border:1px solid #242424;border-top-color:#323232;color:#aeaeae;
- border-radius:var(--r-md);padding:11px 0;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;cursor:pointer;
+ border-radius:var(--r-md);padding:9px 0;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;cursor:pointer;
  box-shadow:0 3px 8px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.04);transition:transform .1s,color .18s,border-color .18s}
 .presets button:active{transform:translateY(1px) scale(.98);color:var(--gold);border-color:#1c4a35;
  box-shadow:inset 0 2px 6px rgba(0,0,0,.6)}
 
-.play{width:100%;margin-top:14px;border:0;border-radius:var(--r-xl);padding:19px;font-size:17px;font-weight:700;
+.play{width:100%;margin-top:10px;border:0;border-radius:var(--r-xl);padding:15px;font-size:17px;font-weight:700;
  letter-spacing:.3px;cursor:pointer;color:#0f0f0f;font-variant-numeric:tabular-nums;
  display:flex;align-items:center;justify-content:center;gap:9px;
  background:linear-gradient(180deg,#76ffbf 0%,var(--gold) 46%,#16d97e 100%);
@@ -193,32 +188,22 @@ button,select,.beat,input[type=range]{touch-action:manipulation;font-family:inhe
 .play.cnt{background:linear-gradient(180deg,#181818,#111111);color:var(--gold);font-size:30px;letter-spacing:4px;
  box-shadow:0 0 0 1.5px rgba(41,240,147,.35) inset,0 0 24px rgba(41,240,147,.12);animation:countPulse .5s ease-out}
 
-.foot{flex:none;text-align:center;font-size:9.5px;letter-spacing:1.4px;color:#3e3e3e;padding:2px 0 0}
-
 @keyframes hit{0%{transform:scale(1)}28%{transform:scale(1.16);box-shadow:0 0 26px rgba(41,240,147,.55)}100%{transform:scale(1.04);box-shadow:0 0 12px rgba(41,240,147,.28)}}
 @keyframes hitRest{0%{transform:scale(1)}30%{transform:scale(1.07)}100%{transform:scale(1.02)}}
 @keyframes ring{0%{opacity:.9;transform:scale(.72)}100%{opacity:0;transform:scale(1.25)}}
 @keyframes cIn{0%{opacity:0;transform:scale(.9) translateY(6px);filter:blur(5px)}100%{opacity:1;transform:none;filter:blur(0)}}
 @keyframes sIn{0%{opacity:0}100%{opacity:.42}}
 @keyframes spin{to{transform:rotate(360deg)}}
-@keyframes live{0%,100%{opacity:1}50%{opacity:.35}}
 @keyframes countPulse{0%{box-shadow:0 0 0 1.5px rgba(41,240,147,.9) inset,0 0 44px rgba(41,240,147,.3)}100%{box-shadow:0 0 0 1.5px rgba(41,240,147,.35) inset,0 0 24px rgba(41,240,147,.12)}}
-@media (max-width:360px){.slot.center svg{width:132px}.slot svg{width:72px}.pick h2{font-size:24px}}
+@media (max-width:360px){.slot.center svg{width:108px}.slot svg{width:60px}.pick h2{font-size:22px}}
 </style>
 </head>
 <body>
 <div class="grain"></div>
 <div class="app" id="app">
 
-  <div class="bar">
-    <div class="brand"><span class="live"></span>GUITAR PRACTICE</div>
-    <div class="chip" id="loadChip"><span class="spin"></span><span id="loadTxt">зареждам мостри</span></div>
-  </div>
-
   <div class="pick">
-    <div class="eyebrow">УПРАЖНЕНИЕ</div>
-    <h2 id="title">—</h2>
-    <div class="pickHint"><b>докосни</b> за друга песен</div>
+    <h2 id="title">Song</h2>
     <select id="songSel"></select>
     <div class="chev"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></div>
   </div>
@@ -233,13 +218,13 @@ button,select,.beat,input[type=range]{touch-action:manipulation;font-family:inhe
   </section>
 
   <section class="card">
-    <div class="cardHead"><span class="label">STRUMMING PATTERN</span><span class="fine">докосни удар, за да го смениш</span></div>
+    <div class="cardHead"><span class="label">STRUMMING PATTERN</span></div>
     <div class="strum" id="strum"></div>
     <div class="counts"><span class="n">1</span><span>&amp;</span><span class="n">2</span><span>&amp;</span><span class="n">3</span><span>&amp;</span><span class="n">4</span><span>&amp;</span></div>
   </section>
 
   <section class="card">
-    <div class="bpmRow"><span class="label">ТЕМПО</span><div class="bpmNum"><span id="bpmVal">60</span><i>BPM</i></div></div>
+    <div class="bpmRow"><span class="label">ТЕМПО</span><div class="bpmNum"><span id="bpmVal">60</span><i>BPM</i><button class="bpmReset" id="bpmReset" title="Оригинално темпо" aria-label="Оригинално темпо"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></button></div></div>
     <div class="fader">
       <div class="faderEnds"><span>35</span><span>200</span></div>
       <div class="faderTrack"><div class="faderFill" id="faderFill"></div></div>
@@ -252,8 +237,6 @@ button,select,.beat,input[type=range]{touch-action:manipulation;font-family:inhe
     </div>
     <button class="play" id="play"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M7.5 4.5v15l13-7.5z"/></svg><span>Play</span></button>
   </section>
-
-  <div class="foot" id="foot">ПРОСВИРВАНЕ · 4/4</div>
 </div>
 
 <script>
@@ -316,106 +299,85 @@ const P = {
 };
 
 /* ================= ПЕСНИ И УПРАЖНЕНИЯ ================= */
-const G1='Play Throughs (Beginner)', G2='Play Throughs (Easy)', G3='Play Throughs (Medium)',
-      G4='Play Throughs (Hard)', G5='G C Em D Chords Only', G6='Fingerstyle Favourites',
-      G7='Преходи между акорди';
+const GE='EASY', GM='MEDIUM', GH='HARD', GF='FINGERSTYLE', GT='Преходи между акорди';
 
 const LIST = [
- /* ---------- BEGINNER ---------- */
- {grp:G1, n:"Perfect — Ed Sheeran (Easiest)",   b:64, p:P.POP,    c:['G','Em','C','D']},
- {grp:G1, n:"Tennessee Whiskey — Chris Stapleton", b:50, p:P.BALLAD, c:['G','Am','G','Am']},
- {grp:G1, n:"Stand By Me — Ben E. King",        b:72, p:P.BALLAD, c:['G','G','Em','Em','C','D','G','G']},
- {grp:G1, n:"Wagon Wheel — Darius Rucker",      b:76, p:P.POP,    c:['G','D','Em','C']},
- {grp:G1, n:"Brown Eyed Girl — Van Morrison",   b:76, p:P.POP,    c:['G','C','G','D']},
- {grp:G1, n:"Revival — Zach Bryan",             b:80, p:P.POP,    c:['G','D','Em','C']},
- {grp:G1, n:"Heaven — Bryan Adams",             b:66, p:P.POP,    c:['G','D','Em','C']},
- {grp:G1, n:"Knockin' on Heaven's Door — Bob Dylan", b:60, p:P.HEAVEN, c:['G','D','Am','Am','G','D','C','C']},
- {grp:G1, n:"Leavin' On A Jet Plane — John Denver", b:72, p:P.FOLK, c:['G','C','G','C','G','C','D','D']},
-
  /* ---------- EASY ---------- */
- {grp:G2, n:"Ain't No Sunshine — Bill Withers", b:70, p:P.SIMPLE, c:['Am','Em','G','Am']},
- {grp:G2, n:"Stand By Me — Ben E. King",        b:72, p:P.BALLAD, c:['G','G','Em','Em','C','D','G','G']},
- {grp:G2, n:"Wagon Wheel — Darius Rucker",      b:76, p:P.POP,    c:['G','D','Em','C']},
- {grp:G2, n:"Chicken Fried — Zac Brown Band",   b:84, p:P.POP,    c:['G','C','G','D']},
- {grp:G2, n:"Learning to Fly — Tom Petty",      b:74, p:P.POP,    c:['F','C','Am','G']},
- {grp:G2, n:"Worst Way — Riley Green",          b:76, p:P.POP,    c:['G','D','Em','C']},
- {grp:G2, n:"I'm Yours — Jason Mraz",           b:76, p:P.POP,    c:['C','G','Am','F']},
- {grp:G2, n:"Take Me Home, Country Roads — John Denver", b:82, p:P.POP, c:['G','Em','D','C','G','D','G','G']},
- {grp:G2, n:"Mr. Jones — Counting Crows",       b:88, p:P.POP,    c:['Am','F','Dm','G']},
- {grp:G2, n:"Good Riddance — Green Day",        b:82, p:P.FOLK,   c:['G','C','D','D']},
- {grp:G2, n:"Every Rose Has Its Thorn — Poison",b:66, p:P.POP,    c:['G','C','G','D']},
+ {grp:GE, n:"Perfect — Ed Sheeran (Easiest)",   b:64, p:P.POP,    c:['G','Em','C','D']},
+ {grp:GE, n:"Tennessee Whiskey — Chris Stapleton", b:50, p:P.BALLAD, c:['G','Am','G','Am']},
+ {grp:GE, n:"Stand By Me — Ben E. King",        b:72, p:P.BALLAD, c:['G','G','Em','Em','C','D','G','G']},
+ {grp:GE, n:"Wagon Wheel — Darius Rucker",      b:76, p:P.POP,    c:['G','D','Em','C']},
+ {grp:GE, n:"Brown Eyed Girl — Van Morrison",   b:76, p:P.POP,    c:['G','C','G','D']},
+ {grp:GE, n:"Revival — Zach Bryan",             b:80, p:P.POP,    c:['G','D','Em','C']},
+ {grp:GE, n:"Heaven — Bryan Adams",             b:66, p:P.POP,    c:['G','D','Em','C']},
+ {grp:GE, n:"Knockin' on Heaven's Door — Bob Dylan", b:60, p:P.HEAVEN, c:['G','D','Am','Am','G','D','C','C']},
+ {grp:GE, n:"Leavin' On A Jet Plane — John Denver", b:72, p:P.FOLK, c:['G','C','G','C','G','C','D','D']},
+ {grp:GE, n:"Ain't No Sunshine — Bill Withers", b:70, p:P.SIMPLE, c:['Am','Em','G','Am']},
+ {grp:GE, n:"Chicken Fried — Zac Brown Band",   b:84, p:P.POP,    c:['G','C','G','D']},
+ {grp:GE, n:"Learning to Fly — Tom Petty",      b:74, p:P.POP,    c:['F','C','Am','G']},
+ {grp:GE, n:"Worst Way — Riley Green",          b:76, p:P.POP,    c:['G','D','Em','C']},
+ {grp:GE, n:"I'm Yours — Jason Mraz",           b:76, p:P.POP,    c:['C','G','Am','F']},
+ {grp:GE, n:"Take Me Home, Country Roads — John Denver", b:82, p:P.POP, c:['G','Em','D','C','G','D','G','G']},
+ {grp:GE, n:"Mr. Jones — Counting Crows",       b:88, p:P.POP,    c:['Am','F','Dm','G']},
+ {grp:GE, n:"Good Riddance — Green Day",        b:82, p:P.FOLK,   c:['G','C','D','D']},
+ {grp:GE, n:"Every Rose Has Its Thorn — Poison",b:66, p:P.POP,    c:['G','C','G','D']},
 
  /* ---------- MEDIUM ---------- */
- {grp:G3, n:"Riptide — Vance Joy",              b:100,p:P.POP,    c:['Am','G','C','C']},
- {grp:G3, n:"Ring of Fire — Johnny Cash",       b:96, p:P.FOLK,   c:['G','C','G','G','D','C','G','G']},
- {grp:G3, n:"Folsom Prison Blues — Johnny Cash",b:100,p:P.ROCK,   c:['E','E','A','A','E','E','B7','E']},
- {grp:G3, n:"Drift Away — Uncle Kracker",       b:84, p:P.POP,    c:['G','C','G','D']},
- {grp:G3, n:"Can't Help Falling in Love — Elvis",b:56,p:P.BALLAD, c:['C','Em','Am','F','C','G','C','C']},
- {grp:G3, n:"Fast Car — Tracy Chapman",         b:100,p:P.POP,    c:['C','G','Em','D']},
- {grp:G3, n:"You're Still The One — Shania Twain",b:64,p:P.POP,   c:['C','F','C','G']},
- {grp:G3, n:"Free Fallin' — Tom Petty",         b:82, p:P.POP,    c:['D','A','G','A']},
- {grp:G3, n:"Hey, Soul Sister — Train",         b:97, p:P.POP,    c:['C','G','Am','F']},
- {grp:G3, n:"Hallelujah — Leonard Cohen",       b:56, p:P.BALLAD, c:['C','Am','C','Am','F','G','C','G']},
- {grp:G3, n:"Have You Ever Seen The Rain — CCR",b:88, p:P.POP,    c:['Am','F','C','G','C','G','F','C']},
- {grp:G3, n:"Hey There Delilah — Plain White T's",b:60,p:P.SIMPLE,c:['D','F#m','D','F#m']},
- {grp:G3, n:"Night Moves — Bob Seger",          b:80, p:P.FOLK,   c:['G','C','D','G']},
- {grp:G3, n:"Take It Easy — Eagles",            b:92, p:P.POP,    c:['G','D','C','G']},
- {grp:G3, n:"Wish You Were Here — Pink Floyd",  b:60, p:P.FOLK,   c:['C','D','Am','Am','C','D','G','G']},
- {grp:G3, n:"Blowin' in the Wind — Bob Dylan",  b:80, p:P.FOLK,   c:['G','C','G','G','C','D','G','G']},
+ {grp:GM, n:"Riptide — Vance Joy",              b:100,p:P.POP,    c:['Am','G','C','C']},
+ {grp:GM, n:"Ring of Fire — Johnny Cash",       b:96, p:P.FOLK,   c:['G','C','G','G','D','C','G','G']},
+ {grp:GM, n:"Folsom Prison Blues — Johnny Cash",b:100,p:P.ROCK,   c:['E','E','A','A','E','E','B7','E']},
+ {grp:GM, n:"Drift Away — Uncle Kracker",       b:84, p:P.POP,    c:['G','C','G','D']},
+ {grp:GM, n:"Can't Help Falling in Love — Elvis",b:56,p:P.BALLAD, c:['C','Em','Am','F','C','G','C','C']},
+ {grp:GM, n:"Fast Car — Tracy Chapman",         b:100,p:P.POP,    c:['C','G','Em','D']},
+ {grp:GM, n:"You're Still The One — Shania Twain",b:64,p:P.POP,   c:['C','F','C','G']},
+ {grp:GM, n:"Free Fallin' — Tom Petty",         b:82, p:P.POP,    c:['D','A','G','A']},
+ {grp:GM, n:"Hey, Soul Sister — Train",         b:97, p:P.POP,    c:['C','G','Am','F']},
+ {grp:GM, n:"Hallelujah — Leonard Cohen",       b:56, p:P.BALLAD, c:['C','Am','C','Am','F','G','C','G']},
+ {grp:GM, n:"Have You Ever Seen The Rain — CCR",b:88, p:P.POP,    c:['Am','F','C','G','C','G','F','C']},
+ {grp:GM, n:"Hey There Delilah — Plain White T's",b:60,p:P.SIMPLE,c:['D','F#m','D','F#m']},
+ {grp:GM, n:"Night Moves — Bob Seger",          b:80, p:P.FOLK,   c:['G','C','D','G']},
+ {grp:GM, n:"Take It Easy — Eagles",            b:92, p:P.POP,    c:['G','D','C','G']},
+ {grp:GM, n:"Wish You Were Here — Pink Floyd",  b:60, p:P.FOLK,   c:['C','D','Am','Am','C','D','G','G']},
+ {grp:GM, n:"Blowin' in the Wind — Bob Dylan",  b:80, p:P.FOLK,   c:['G','C','G','G','C','D','G','G']},
 
  /* ---------- HARD ---------- */
- {grp:G4, n:"Starting Over — Chris Stapleton",  b:78, p:P.POP,    c:['G','D','Em','C']},
- {grp:G4, n:"Wonderwall — Oasis",               b:87, p:P.POP,    c:['Em7','G','Dsus4','A7sus4']},
- {grp:G4, n:"Landslide — Fleetwood Mac",        b:70, p:P.SIMPLE, c:['C','G','Am7','G']},
-
- /* ---------- САМО G C Em D ---------- */
- {grp:G5, n:"Stand By Me — Ben E. King",        b:72, p:P.BALLAD, c:['G','Em','C','D']},
- {grp:G5, n:"Wagon Wheel — Darius Rucker",      b:76, p:P.POP,    c:['G','D','Em','C']},
- {grp:G5, n:"Revival — Zach Bryan",             b:80, p:P.POP,    c:['G','D','Em','C']},
- {grp:G5, n:"Brown Eyed Girl — Van Morrison",   b:76, p:P.POP,    c:['G','C','G','D']},
- {grp:G5, n:"Leavin' On A Jet Plane — John Denver", b:72, p:P.FOLK, c:['G','C','G','C','G','C','D','D']},
- {grp:G5, n:"Chicken Fried — Zac Brown Band",   b:84, p:P.POP,    c:['G','C','G','D']},
- {grp:G5, n:"Take Me Home, Country Roads",      b:82, p:P.POP,    c:['G','Em','D','C']},
- {grp:G5, n:"Every Rose Has Its Thorn (Easy)",  b:66, p:P.POP,    c:['G','C','G','D']},
- {grp:G5, n:"I'm Yours — Jason Mraz",           b:76, p:P.POP,    c:['G','D','Em','C']},
- {grp:G5, n:"Good Riddance — Green Day",        b:82, p:P.FOLK,   c:['G','C','D','D']},
- {grp:G5, n:"Blowin' in the Wind — Bob Dylan",  b:80, p:P.FOLK,   c:['G','C','G','D']},
- {grp:G5, n:"Ring of Fire — Johnny Cash",       b:96, p:P.FOLK,   c:['G','C','G','D']},
+ {grp:GH, n:"Starting Over — Chris Stapleton",  b:78, p:P.POP,    c:['G','D','Em','C']},
+ {grp:GH, n:"Wonderwall — Oasis",               b:87, p:P.POP,    c:['Em7','G','Dsus4','A7sus4']},
+ {grp:GH, n:"Landslide — Fleetwood Mac",        b:70, p:P.SIMPLE, c:['C','G','Am7','G']},
+ {grp:GH, n:"Zombie — The Cranberries",         b:84, p:P.POP,    c:['Em','C','G','D']},
+ {grp:GH, n:"A Horse With No Name",             b:80, p:P.POP,    c:['Em','D6/9','Em','D6/9']},
+ {grp:GH, n:"Let It Be — The Beatles",          b:72, p:P.POP,    c:['C','G','Am','Fmaj7','C','G','F','C']},
+ {grp:GH, n:"Bad Moon Rising — CCR",            b:90, p:P.FOLK,   c:['D','A','G','D','D','A','G','D']},
+ {grp:GH, n:"Hey Jude — The Beatles",           b:74, p:P.POP,    c:['C','G','G7','C','F','C','G','C']},
+ {grp:GH, n:"Sweet Home Alabama",               b:98, p:P.ROCK,   c:['D','Cadd9','G','G']},
+ {grp:GH, n:"House of the Rising Sun",          b:70, p:P.FOLK,   c:['Am','C','D','F','Am','C','E','E']},
+ {grp:GH, n:"Save Tonight (Am F C G)",          b:88, p:P.POP,    c:['Am','F','C','G']},
 
  /* ---------- FINGERSTYLE ---------- */
- {grp:G6, n:"Ain't No Sunshine — Bill Withers", b:64, p:P.SIMPLE, c:['Am','Em','G','Am']},
- {grp:G6, n:"Fast Car — Tracy Chapman",         b:66, p:P.SIMPLE, c:['C','G','Em','D']},
- {grp:G6, n:"Hey There Delilah — Plain White T's",b:58,p:P.SIMPLE,c:['D','F#m','D','F#m']},
- {grp:G6, n:"Hallelujah — Leonard Cohen",       b:52, p:P.SIMPLE, c:['C','Am','C','Am','F','G','C','G']},
- {grp:G6, n:"Can't Help Falling in Love — Elvis",b:50,p:P.SIMPLE, c:['C','Em','Am','F','C','G','C','C']},
- {grp:G6, n:"Landslide — Fleetwood Mac",        b:62, p:P.SIMPLE, c:['C','G','Am7','G']},
+ {grp:GF, n:"Ain't No Sunshine — Bill Withers", b:64, p:P.SIMPLE, c:['Am','Em','G','Am']},
+ {grp:GF, n:"Fast Car — Tracy Chapman",         b:66, p:P.SIMPLE, c:['C','G','Em','D']},
+ {grp:GF, n:"Hey There Delilah — Plain White T's",b:58,p:P.SIMPLE,c:['D','F#m','D','F#m']},
+ {grp:GF, n:"Hallelujah — Leonard Cohen",       b:52, p:P.SIMPLE, c:['C','Am','C','Am','F','G','C','G']},
+ {grp:GF, n:"Can't Help Falling in Love — Elvis",b:50,p:P.SIMPLE, c:['C','Em','Am','F','C','G','C','C']},
+ {grp:GF, n:"Landslide — Fleetwood Mac",        b:62, p:P.SIMPLE, c:['C','G','Am7','G']},
 
- /* ---------- ДРУГИ ПЕСНИ ---------- */
- {grp:'Още песни', n:"Zombie — The Cranberries", b:84, p:P.POP,  c:['Em','C','G','D']},
- {grp:'Още песни', n:"A Horse With No Name",     b:80, p:P.POP,  c:['Em','D6/9','Em','D6/9']},
- {grp:'Още песни', n:"Let It Be — The Beatles",  b:72, p:P.POP,  c:['C','G','Am','Fmaj7','C','G','F','C']},
- {grp:'Още песни', n:"Bad Moon Rising — CCR",    b:90, p:P.FOLK, c:['D','A','G','D','D','A','G','D']},
- {grp:'Още песни', n:"Hey Jude — The Beatles",   b:74, p:P.POP,  c:['C','G','G7','C','F','C','G','C']},
- {grp:'Още песни', n:"Sweet Home Alabama",       b:98, p:P.ROCK, c:['D','Cadd9','G','G']},
- {grp:'Още песни', n:"House of the Rising Sun",  b:70, p:P.FOLK, c:['Am','C','D','F','Am','C','E','E']},
- {grp:'Още песни', n:"Save Tonight (Am F C G)",  b:88, p:P.POP,  c:['Am','F','C','G']},
-
- {grp:G7, n:"G ↔ C",            b:50, p:P.DOWN, c:['G','C']},
- {grp:'Преходи между акорди', n:"G ↔ D",            b:50, p:P.DOWN, c:['G','D']},
- {grp:'Преходи между акорди', n:"C ↔ Am",           b:50, p:P.DOWN, c:['C','Am']},
- {grp:'Преходи между акорди', n:"C ↔ G",            b:50, p:P.DOWN, c:['C','G']},
- {grp:'Преходи между акорди', n:"Am ↔ E",           b:50, p:P.DOWN, c:['Am','E']},
- {grp:'Преходи между акорди', n:"Am ↔ F",           b:45, p:P.DOWN, c:['Am','F']},
- {grp:'Преходи между акорди', n:"D ↔ A",            b:50, p:P.DOWN, c:['D','A']},
- {grp:'Преходи между акорди', n:"Em ↔ G",           b:55, p:P.DOWN, c:['Em','G']},
- {grp:'Преходи между акорди', n:"E ↔ A ↔ D",        b:52, p:P.DOWN, c:['E','A','D']},
- {grp:'Преходи между акорди', n:"G · D · Am · C",   b:55, p:P.DOWN, c:['G','D','Am','C']},
- {grp:'Преходи между акорди', n:"C · G · Am · F",   b:55, p:P.DOWN, c:['C','G','Am','F']},
- {grp:'Преходи между акорди', n:"C · Am · F · G",   b:55, p:P.DOWN, c:['C','Am','F','G']},
- {grp:'Преходи между акорди', n:"Баре F ↔ C",       b:42, p:P.SIMPLE, c:['F','C']},
- {grp:'Преходи между акорди', n:"Баре Bm ↔ G",      b:45, p:P.SIMPLE, c:['Bm','G']},
- {grp:'Преходи между акорди', n:"D · Dsus4 · D · Dsus2", b:60, p:P.FOLK, c:['D','Dsus4','D','Dsus2']},
- {grp:'Преходи между акорди', n:"12-тактов блус в A", b:80, p:P.ROCK, c:['A','A','A','A','D','D','A','A','E','D','A','E']}
+ /* ---------- ПРЕХОДИ МЕЖДУ АКОРДИ ---------- */
+ {grp:GT, n:"G ↔ C",            b:50, p:P.DOWN, c:['G','C']},
+ {grp:GT, n:"G ↔ D",            b:50, p:P.DOWN, c:['G','D']},
+ {grp:GT, n:"C ↔ Am",           b:50, p:P.DOWN, c:['C','Am']},
+ {grp:GT, n:"C ↔ G",            b:50, p:P.DOWN, c:['C','G']},
+ {grp:GT, n:"Am ↔ E",           b:50, p:P.DOWN, c:['Am','E']},
+ {grp:GT, n:"Am ↔ F",           b:45, p:P.DOWN, c:['Am','F']},
+ {grp:GT, n:"D ↔ A",            b:50, p:P.DOWN, c:['D','A']},
+ {grp:GT, n:"Em ↔ G",           b:55, p:P.DOWN, c:['Em','G']},
+ {grp:GT, n:"E ↔ A ↔ D",        b:52, p:P.DOWN, c:['E','A','D']},
+ {grp:GT, n:"G · D · Am · C",   b:55, p:P.DOWN, c:['G','D','Am','C']},
+ {grp:GT, n:"C · G · Am · F",   b:55, p:P.DOWN, c:['C','G','Am','F']},
+ {grp:GT, n:"C · Am · F · G",   b:55, p:P.DOWN, c:['C','Am','F','G']},
+ {grp:GT, n:"Баре F ↔ C",       b:42, p:P.SIMPLE, c:['F','C']},
+ {grp:GT, n:"Баре Bm ↔ G",      b:45, p:P.SIMPLE, c:['Bm','G']},
+ {grp:GT, n:"D · Dsus4 · D · Dsus2", b:60, p:P.FOLK, c:['D','Dsus4','D','Dsus2']},
+ {grp:GT, n:"12-тактов блус в A", b:80, p:P.ROCK, c:['A','A','A','A','D','D','A','A','E','D','A','E']}
 ];
 
 /* ================= ДИАГРАМА ================= */
@@ -648,7 +610,7 @@ function buildSelect(){
     html += `<option value="${i}">${s.n}</option>`;
   });
   sel.innerHTML = html+'</optgroup>';
-  sel.onchange = e => load(+e.target.value);
+  sel.onchange = e => { load(+e.target.value); $('title').textContent = cur.n; };
 }
 
 function load(i){
@@ -656,8 +618,7 @@ function load(i){
   cur = JSON.parse(JSON.stringify(LIST[i]));
   bpm = cur.b; $('bpm').value = bpm; $('bpmVal').textContent = bpm;
   bar = 0; slot = 0;
-  $('title').textContent = cur.n;
-  renderAnchorBtn(); renderDots(); renderChords(); renderStrum();
+  renderAnchorBtn(); renderDots(); renderChords(); renderStrum(); syncBpmReset();
   if(ac) setTimeout(prewarm, 20);
 }
 
@@ -669,6 +630,7 @@ function renderAnchorBtn(){
   b.className = 'anchor' + (ok ? (anchorOn?' on':'') : ' dis');
   b.innerHTML = ICONS.anchor + '<span>' + (ok ? (anchorOn ? 'Anchored chords ON' : 'Anchor chords')
                      : 'Няма anchor версия') + '</span>';
+  $('app').classList.toggle('anchorActive', ok && anchorOn);
 }
 
 $('anchorBtn').onclick = ()=>{
@@ -686,11 +648,8 @@ function renderChords(){
   $('chords').innerHTML = cell(cur.c[(bar-1+n)%n],'side')+cell(cur.c[bar],'center')+cell(cur.c[(bar+1)%n],'side');
 }
 function renderStrum(){
-  $('strum').innerHTML = cur.p.map((v,i)=>`<div class="beat ${v!=='-'?'act':''}" data-i="${i}">${v==='U'?'↑':'↓'}</div>`).join('');
-  document.querySelectorAll('.beat').forEach(el=>{
-    el.onclick = ()=>{ const i=+el.dataset.i, v=cur.p[i];
-      cur.p[i] = v==='-' ? (i%2===0?'D':'U') : (v==='D'?'U':'-'); renderStrum(); };
-  });
+  /* само визуализация - патернът не е кликаем/редактируем от юзъра */
+  $('strum').innerHTML = cur.p.map((v)=>`<div class="beat ${v!=='-'?'act':''}">${v==='U'?'↑':'↓'}</div>`).join('');
 }
 function highlight(){
   document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('on', i===bar));
@@ -795,16 +754,29 @@ function stop(){
 }
 
 /* ================= КОНТРОЛИ ================= */
+/* малкото ↺ до BPM се показва само когато темпото се различава от оригинала на песента */
+function syncBpmReset(){
+  const r = $('bpmReset');
+  if(!r) return;
+  r.classList.toggle('show', !!(cur && bpm !== cur.b));
+}
+$('bpmReset').onclick = ()=>{
+  if(!cur) return;
+  bpm = cur.b; $('bpm').value = bpm; $('bpmVal').textContent = bpm;
+  $('bpm').dispatchEvent(new Event('input'));
+  syncBpmReset();
+};
+
 $('play').onclick = ()=> playing ? stop() : start();
-$('bpm').oninput = e => { bpm=+e.target.value; $('bpmVal').textContent=bpm; };
+$('bpm').oninput = e => { bpm=+e.target.value; $('bpmVal').textContent=bpm; syncBpmReset(); };
 document.querySelectorAll('.presets button').forEach(b=>{
-  b.onclick = ()=>{ bpm=+b.dataset.b; $('bpm').value=bpm; $('bpmVal').textContent=bpm; };
+  b.onclick = ()=>{ bpm=+b.dataset.b; $('bpm').value=bpm; $('bpmVal').textContent=bpm; syncBpmReset(); };
 });
 document.addEventListener('keydown', e=>{
   if(e.target.tagName==='SELECT') return;
   if(e.code==='Space'){ e.preventDefault(); playing?stop():start(); }
-  if(e.code==='ArrowUp'){ e.preventDefault(); bpm=Math.min(200,bpm+5); $('bpm').value=bpm; $('bpmVal').textContent=bpm; }
-  if(e.code==='ArrowDown'){ e.preventDefault(); bpm=Math.max(35,bpm-5); $('bpm').value=bpm; $('bpmVal').textContent=bpm; }
+  if(e.code==='ArrowUp'){ e.preventDefault(); bpm=Math.min(200,bpm+5); $('bpm').value=bpm; $('bpmVal').textContent=bpm; syncBpmReset(); }
+  if(e.code==='ArrowDown'){ e.preventDefault(); bpm=Math.max(35,bpm-5); $('bpm').value=bpm; $('bpmVal').textContent=bpm; syncBpmReset(); }
 });
 
 buildSelect();
@@ -885,6 +857,7 @@ window.__polish = function(){
   let shown = false, done = false;
   setInterval(() => {
     paint();
+    if(!chip || !chipTxt) return; /* горната лента с индикатора за зареждане е премахната по дизайн */
     let st;
     try{ st = probe(); }catch(e){ return; }
     if(st.f){ chip.className = 'chip show err'; chipTxt.textContent = 'няма връзка към мострите'; return; }

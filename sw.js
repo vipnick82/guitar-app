@@ -2,7 +2,7 @@
    Кешира самата страница и всички mp3 мостри на китарата, така че
    след първото отваряне работи и без интернет (в самолет, в мазето, навсякъде). */
 
-const VERSION = 'guitar-practice-v1';
+const VERSION = 'guitar-practice-v2';
 const SHELL = [
   './',
   './index.html',

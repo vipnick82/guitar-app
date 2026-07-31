@@ -473,42 +473,59 @@ const $ = id => document.getElementById(id);
      двигателят взима най-близката мостра и транспонирането пада под 1 полутон
      (по-малко транспониране = по-малко изкривяване на дървения тембър). */
 
+/* КОЯ КИТАРА СВИРИ — смени само този ред:
+     'nylon'    найлонови струни. Топъл, кръгъл тон - спектърът им съвпада с
+                референтния запис (центроид ~230 Hz), но атаката е запазена,
+                затова звучи топло И ясно, за разлика от филтрувана мостра.
+     'acoustic' стоманена акустика. По-ярка, повече звън от перцето.          */
+const GUITAR = 'nylon';
+
+const SMP_SETS = {
+  nylon: {
+    dir: 'guitar-nylon',
+    core:  { 'E2':40, 'A2':45, 'D3':50, 'G3':55, 'B3':59, 'E4':64 },
+    // покритие на всеки ~2 полутона → транспонирането пада под 1 полутон
+    extra: { 'Fs2':42,'Gs2':44,'B2':47,'Cs3':49,'E3':52,'Fs3':54,
+             'A3':57,'Cs4':61,'Ds4':63,'Fs4':66,'Gs4':68,'A4':69 }
+  },
+  acoustic: {
+    dir: 'guitar-acoustic',
+    core:  { 'E2':40, 'A2':45, 'D3':50, 'G3':55, 'B3':59, 'E4':64 },
+    extra: { 'F2':41,'Fs2':42,'G2':43,'Gs2':44,'As2':46,'B2':47,
+             'C3':48,'Cs3':49,'Ds3':51,'E3':52,'F3':53,'Fs3':54,'Gs3':56,'A3':57,'As3':58,
+             'C4':60,'Cs4':61,'D4':62,'F4':65,'Fs4':66,'G4':67,'Gs4':68 }
+  }
+};
+
+const SMP_SET = SMP_SETS[GUITAR] || SMP_SETS.acoustic;
 const SMP_HOSTS = [
-  'https://nbrosowsky.github.io/tonejs-instruments/samples/guitar-acoustic/',
-  'https://raw.githubusercontent.com/nbrosowsky/tonejs-instruments/master/samples/guitar-acoustic/'
+  'https://nbrosowsky.github.io/tonejs-instruments/samples/' + SMP_SET.dir + '/',
+  'https://raw.githubusercontent.com/nbrosowsky/tonejs-instruments/master/samples/' + SMP_SET.dir + '/'
 ];
 
 const OPEN = [40,45,50,55,59,64];            // MIDI на празните струни (E2 A2 D3 G3 B3 E4)
 
-// Шестте отворени струни — задължителни
-const CORE_SMP = { 'E2':40, 'A2':45, 'D3':50, 'G3':55, 'B3':59, 'E4':64 };
-// Останалите ноти в обхвата на акордите — по избор, само подобряват качеството
-const EXTRA_SMP = {
-  'F2':41,'Fs2':42,'G2':43,'Gs2':44,'As2':46,'B2':47,
-  'C3':48,'Cs3':49,'Ds3':51,'E3':52,'F3':53,'Fs3':54,'Gs3':56,'A3':57,'As3':58,
-  'C4':60,'Cs4':61,'D4':62,'F4':65,'Fs4':66,'G4':67,'Gs4':68
-};
+const CORE_SMP  = SMP_SET.core;              // шестте отворени струни — задължителни
+const EXTRA_SMP = SMP_SET.extra;             // междинните — само подобряват качеството
 
 /* ---------- тонална корекция ----------
-   Измерено върху референтния запис (G, Cadd9, Em7, Dsus4 на 40 BPM, взет е
-   чистият звън между метрономните кликове):
-     • спектрален центроид        228 Hz
-     • ниски(80-1k):високи(1k-8k) ~125:1   (суровата мостра е под 1:1)
-     • спектърът пикира ~400 Hz и пада стръмно: -3 dB на 800, -10 на 1200,
-       -27 на 2000 Hz — по-стръмно, отколкото два филтъра могат да дадат.
-   Затова са три степени. Ясното звучене идва от чистия бас (highpass маха
-   тътена) и лекия акцент около 300 Hz, а не от високите.
+   ВАЖНО: топлината идва от САМИТЕ мостри (найлонови струни), не от филтър.
+   Агресивното нискочестотно филтриране на ярка мостра дава друго нещо — то
+   реже атаката на перцето, която носи яснотата, и звучи приглушено.
+   Затова тук остават само две дискретни корекции:
+     • highpass — маха тътена под най-ниската струна, това ЧИСТИ звука
+     • лек shelf — сваля само съскането от mp3 компресията и транспонирането
 
-   ПО-ТЪМНО  → намали трите числа      ПО-ЯРКО → увеличи ги                  */
-const TONE_HP  = 70;      // маха тътена под най-ниската струна (E2 = 82 Hz)
-const TONE_LP1 = 900;
-const TONE_LP2 = 1100;
-const TONE_LP3 = 2200;
+   ПО-ЯРКО → вдигни TONE_SHELF_DB към 0    ПО-МЕКО → свали го към -6          */
+const TONE_HP       = 70;     // под E2 (82 Hz) няма полезен звук, само тътен
+const TONE_LP       = 6500;   // маха само високочестотното съскане
+const TONE_SHELF_HZ = 3400;
+const TONE_SHELF_DB = -2.5;   // деликатно, за да остане атаката
 
 /* Колко дълго звучи една струна, преди сама да заглъхне (сек).
    Референтният звук е на -20 dB към 0.9 s и на -30 dB към 1.05 s. */
-const NOTE_HOLD  = 0.55;   // пълно ниво дотук
-const NOTE_FADE  = 0.15;   // после експоненциално заглъхва с тази константа
+const NOTE_HOLD  = 0.70;   // пълно ниво дотук
+const NOTE_FADE  = 0.18;   // после експоненциално заглъхва с тази константа
 
 let ac=null, master=null, dryBus=null, toneBus=null, active=[];
 const smp = new Map();                        // midi → AudioBuffer
@@ -527,26 +544,21 @@ function initAudio(){
 
   master = ac.createGain(); master.gain.value = 0.9; master.connect(out);
 
-  /* китарна шина: dryBus → HP → LP1 → LP2 → LP3 → body → (master + reverb)
+  /* китарна шина: dryBus → HP → LP → shelf → (master + reverb)
      Метрономът НЕ минава оттук, за да си остане ясен.                        */
   dryBus = ac.createGain(); dryBus.gain.value = 1.0;
 
   const hp = ac.createBiquadFilter();
   hp.type='highpass'; hp.frequency.value = TONE_HP; hp.Q.value = 0.707;
 
-  const lp1 = ac.createBiquadFilter();
-  lp1.type='lowpass'; lp1.frequency.value = TONE_LP1; lp1.Q.value = 0.707;
-  const lp2 = ac.createBiquadFilter();
-  lp2.type='lowpass'; lp2.frequency.value = TONE_LP2; lp2.Q.value = 0.707;
-  const lp3 = ac.createBiquadFilter();
-  lp3.type='lowpass'; lp3.frequency.value = TONE_LP3; lp3.Q.value = 0.707;
+  const lp = ac.createBiquadFilter();
+  lp.type='lowpass'; lp.frequency.value = TONE_LP; lp.Q.value = 0.707;
 
-  // лек акцент там, където референтният спектър пикира — дава яснота, не тътен
-  const body = ac.createBiquadFilter();
-  body.type='peaking'; body.frequency.value = 320; body.Q.value = 0.9; body.gain.value = 2.0;
+  const shelf = ac.createBiquadFilter();
+  shelf.type='highshelf'; shelf.frequency.value = TONE_SHELF_HZ; shelf.gain.value = TONE_SHELF_DB;
 
-  dryBus.connect(hp); hp.connect(lp1); lp1.connect(lp2); lp2.connect(lp3); lp3.connect(body);
-  toneBus = body;
+  dryBus.connect(hp); hp.connect(lp); lp.connect(shelf);
+  toneBus = shelf;
   toneBus.connect(master);
 
   // мострите вече носят звука на дървото — само лек цъфтеж въздух в стаята

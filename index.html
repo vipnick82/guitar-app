@@ -165,6 +165,25 @@ button,select,.beat,input[type=range]{touch-action:manipulation;font-family:inhe
 .fader input[type=range]::-moz-range-thumb{width:22px;height:32px;border-radius:var(--r-sm);border:1px solid #5f5f5f;
  background:linear-gradient(180deg,#505050,#242424 44%,#373737);cursor:grab}
 
+/* ---------- удари на акорд (само при упражненията за смяна) ---------- */
+.beatsRow{display:none;align-items:center;justify-content:space-between;gap:10px;margin-top:11px}
+.app.switching .beatsRow{display:flex}
+.beats{display:flex;gap:6px}
+.beats button{width:38px;height:31px;display:flex;align-items:center;justify-content:center;
+ background:linear-gradient(180deg,#161616,#101010);border:1px solid #242424;border-top-color:#323232;
+ color:#9a9a9a;border-radius:var(--r-sm);font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;
+ cursor:pointer;box-shadow:0 3px 8px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.04);
+ transition:transform .1s,color .18s,border-color .18s,background .2s,box-shadow .2s}
+.beats button:active{transform:translateY(1px) scale(.97)}
+.beats button.on{color:var(--gold);border-color:rgba(41,240,147,.5);
+ background:linear-gradient(180deg,#103a26,#0b2418);
+ box-shadow:0 0 14px rgba(41,240,147,.14),inset 0 1px 0 rgba(41,240,147,.18)}
+
+/* ударите извън обхвата на текущия акорд стоят приглушени */
+.beat.off{opacity:.2}
+.app[data-lim="2"] .counts span:nth-child(n+3),
+.app[data-lim="4"] .counts span:nth-child(n+5){opacity:.2}
+
 .presets{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:9px}
 .presets button{background:linear-gradient(180deg,#161616,#101010);border:1px solid #242424;border-top-color:#323232;color:#aeaeae;
  border-radius:var(--r-md);padding:9px 0;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;cursor:pointer;
@@ -231,6 +250,14 @@ button,select,.beat,input[type=range]{touch-action:manipulation;font-family:inhe
       <div class="ticks"></div>
       <input type="range" id="bpm" min="35" max="200">
     </div>
+    <div class="beatsRow">
+      <span class="label">УДАРИ НА АКОРД</span>
+      <div class="beats" id="beats">
+        <button data-bp="1">1</button><button data-bp="2">2</button><button data-bp="4">4</button>
+        <button data-bp="r" title="На случаен принцип" aria-label="На случаен принцип"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg></button>
+      </div>
+    </div>
+
     <div class="presets">
       <button data-b="40">40</button><button data-b="60">60</button>
       <button data-b="80">80</button><button data-b="100">100</button>
@@ -463,20 +490,25 @@ const EXTRA_SMP = {
 };
 
 /* ---------- тонална корекция ----------
-   Мострите на tonejs са ярки стоманени струни. Референтният звук, който
-   харесваме, е измеримо по-тъмен: спектрален центроид ~236 Hz и съотношение
-   ниски(80-1k) към високи(1k-8k) около 75:1, докато суровата мостра е под 1:1.
-   Каскада от два меки lowpass-а сваля блясъка на перцето, без да пипа тялото.
+   Измерено върху референтния запис (G, Cadd9, Em7, Dsus4 на 40 BPM, взет е
+   чистият звън между метрономните кликове):
+     • спектрален центроид        228 Hz
+     • ниски(80-1k):високи(1k-8k) ~125:1   (суровата мостра е под 1:1)
+     • спектърът пикира ~400 Hz и пада стръмно: -3 dB на 800, -10 на 1200,
+       -27 на 2000 Hz — по-стръмно, отколкото два филтъра могат да дадат.
+   Затова са три степени. Ясното звучене идва от чистия бас (highpass маха
+   тътена) и лекия акцент около 300 Hz, а не от високите.
 
-   ПО-ТЪМНО  → намали двете числа (напр. 850 / 1150)
-   ПО-ЯРКО   → увеличи ги (напр. 1400 / 2200)                                */
-const TONE_LP1 = 1000;
-const TONE_LP2 = 1400;
+   ПО-ТЪМНО  → намали трите числа      ПО-ЯРКО → увеличи ги                  */
+const TONE_HP  = 70;      // маха тътена под най-ниската струна (E2 = 82 Hz)
+const TONE_LP1 = 900;
+const TONE_LP2 = 1100;
+const TONE_LP3 = 2200;
 
 /* Колко дълго звучи една струна, преди сама да заглъхне (сек).
-   Референтният звук заглъхва напълно за ~1.05 s - иначе акордите се наслагват. */
-const NOTE_HOLD  = 0.70;   // пълно ниво дотук
-const NOTE_FADE  = 0.17;   // след това експоненциално заглъхва с тази константа
+   Референтният звук е на -20 dB към 0.9 s и на -30 dB към 1.05 s. */
+const NOTE_HOLD  = 0.55;   // пълно ниво дотук
+const NOTE_FADE  = 0.15;   // после експоненциално заглъхва с тази константа
 
 let ac=null, master=null, dryBus=null, toneBus=null, active=[];
 const smp = new Map();                        // midi → AudioBuffer
@@ -495,20 +527,25 @@ function initAudio(){
 
   master = ac.createGain(); master.gain.value = 0.9; master.connect(out);
 
-  /* китарна шина: dryBus → LP1 → LP2 → (master + reverb send)
+  /* китарна шина: dryBus → HP → LP1 → LP2 → LP3 → body → (master + reverb)
      Метрономът НЕ минава оттук, за да си остане ясен.                        */
   dryBus = ac.createGain(); dryBus.gain.value = 1.0;
+
+  const hp = ac.createBiquadFilter();
+  hp.type='highpass'; hp.frequency.value = TONE_HP; hp.Q.value = 0.707;
 
   const lp1 = ac.createBiquadFilter();
   lp1.type='lowpass'; lp1.frequency.value = TONE_LP1; lp1.Q.value = 0.707;
   const lp2 = ac.createBiquadFilter();
   lp2.type='lowpass'; lp2.frequency.value = TONE_LP2; lp2.Q.value = 0.707;
+  const lp3 = ac.createBiquadFilter();
+  lp3.type='lowpass'; lp3.frequency.value = TONE_LP3; lp3.Q.value = 0.707;
 
-  // лек топъл акцент в тялото, там където е 88% от енергията на референцията
+  // лек акцент там, където референтният спектър пикира — дава яснота, не тътен
   const body = ac.createBiquadFilter();
-  body.type='peaking'; body.frequency.value = 190; body.Q.value = 0.8; body.gain.value = 2.0;
+  body.type='peaking'; body.frequency.value = 320; body.Q.value = 0.9; body.gain.value = 2.0;
 
-  dryBus.connect(lp1); lp1.connect(lp2); lp2.connect(body);
+  dryBus.connect(hp); hp.connect(lp1); lp1.connect(lp2); lp2.connect(lp3); lp3.connect(body);
   toneBus = body;
   toneBus.connect(master);
 
@@ -676,12 +713,45 @@ function buildSelect(){
   sel.onchange = e => { load(+e.target.value); $('title').textContent = cur.n; };
 }
 
+/* ---------- удари на акорд ----------
+   Само при упражненията за смяна на акорди. Песните винаги вървят по цял такт
+   (4 удара), защото прогресията им е музикална и не бива да се реже. */
+let beatsPer = 4, beatsRandom = false, curSlots = 8;
+
+function isSwitch(){ return !!(cur && cur.grp === GT); }
+
+function pickSlots(){
+  if(!isSwitch()) return 8;                       // цял такт за песните
+  const b = beatsRandom ? [1,2,4][Math.floor(Math.random()*3)] : beatsPer;
+  return b*2;                                     // един удар = две осмини
+}
+
+function renderBeats(){
+  $('app').classList.toggle('switching', isSwitch());
+  document.querySelectorAll('#beats button').forEach(b=>{
+    const v = b.dataset.bp;
+    b.classList.toggle('on', beatsRandom ? v==='r' : v===String(beatsPer));
+  });
+}
+
+document.querySelectorAll('#beats button').forEach(b=>{
+  b.onclick = ()=>{
+    const v = b.dataset.bp;
+    if(v==='r') beatsRandom = true;
+    else { beatsRandom = false; beatsPer = +v; }
+    renderBeats(); renderStrum();
+    if(!playing) curSlots = pickSlots();
+  };
+});
+
 function load(i){
   stop();
   cur = JSON.parse(JSON.stringify(LIST[i]));
+  // упражненията за смяна на акорди винаги тръгват от 60 BPM
+  if(cur.grp === GT) cur.b = 60;
   bpm = cur.b; $('bpm').value = bpm; $('bpmVal').textContent = bpm;
-  bar = 0; slot = 0;
-  renderAnchorBtn(); renderDots(); renderChords(); renderStrum(); syncBpmReset();
+  bar = 0; slot = 0; curSlots = pickSlots();
+  renderAnchorBtn(); renderBeats(); renderDots(); renderChords(); renderStrum(); syncBpmReset();
   if(ac) setTimeout(prewarm, 20);
 }
 
@@ -711,8 +781,12 @@ function renderChords(){
   $('chords').innerHTML = cell(cur.c[(bar-1+n)%n],'side')+cell(cur.c[bar],'center')+cell(cur.c[(bar+1)%n],'side');
 }
 function renderStrum(){
-  /* само визуализация - патернът не е кликаем/редактируем от юзъра */
-  $('strum').innerHTML = cur.p.map((v)=>`<div class="beat ${v!=='-'?'act':''}">${v==='U'?'↑':'↓'}</div>`).join('');
+  /* само визуализация - патернът не е кликаем/редактируем от юзъра.
+     При по-къс акорд ударите извън обхвата стоят приглушени. */
+  const lim = (isSwitch() && !beatsRandom) ? beatsPer*2 : 8;
+  $('strum').innerHTML = cur.p.map((v,i)=>
+    `<div class="beat ${v!=='-'?'act':''}${i>=lim?' off':''}">${v==='U'?'↑':'↓'}</div>`).join('');
+  $('app').dataset.lim = lim;
 }
 function highlight(){
   document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('on', i===bar));
@@ -733,10 +807,11 @@ function schedule(){
       if(slot%2===0) click(nextTime, slot===0);
       const v = cur.p[slot];
       if(v!=='-') strum(nextTime, cur.c[bar], v, slot===0);
-      queue.push({t:nextTime, bar:bar, slot:slot});
+      queue.push({t:nextTime, bar:bar, slot:slot, cs:curSlots});
       nextTime += (60/bpm)/2;
       slot++;
-      if(slot>=8){ slot=0; bar=(bar+1)%cur.c.length; }
+      // акордът се сменя след толкова осмини, колкото искат ударите на акорд
+      if(slot>=curSlots){ slot=0; bar=(bar+1)%cur.c.length; curSlots=pickSlots(); }
     }
   }
 }
@@ -753,6 +828,7 @@ function draw(){
       document.querySelectorAll('.beat').forEach(el=>el.classList.remove('hit','rest'));
     } else {
       const p = $('play');
+      if(ev.cs) $('app').dataset.cs = ev.cs;
       if(p.className!=='play on'){ p.className='play on'; p.innerHTML = ICONS.stop + '<span>Stop</span>'; }
       if(ev.bar !== lastBar){ lastBar = ev.bar; bar = ev.bar; renderChords(); highlight(); }
       document.querySelectorAll('.beat').forEach((el,i)=>{
@@ -786,6 +862,7 @@ function start(){
   keepAwake(true);
   playing = true;
   bar=0; slot=0; queue=[]; lastBar=-1; lastChord=null; active=[];
+  curSlots = pickSlots();
   countIn = 3;                                   // 3 · 2 · 1 и тръгва
   nextTime = ac.currentTime + 0.25;
   $('play').textContent = '3'; $('play').className='play cnt';
@@ -813,7 +890,8 @@ function stop(){
   if(ac) mute(ac.currentTime, 0.015, 0.07);
   const p = $('play'); if(p){ p.className='play'; p.innerHTML = ICONS.play + '<span>Play</span>'; }
   document.querySelectorAll('.beat').forEach(el=>el.classList.remove('hit','rest'));
-  bar = 0; if(cur){ renderChords(); highlight(); }
+  bar = 0; slot = 0; curSlots = pickSlots();
+  if(cur){ renderChords(); highlight(); }
 }
 
 /* ================= КОНТРОЛИ ================= */
@@ -893,7 +971,8 @@ window.__polish = function(){
         app.dataset.slot = hit;
         pulse(hit === 0);
         const b = readBar();
-        fine.innerHTML = 'такт <b>' + (b.i+1) + '</b>/' + b.n + ' · удар <b>' + (Math.floor(hit/2)+1) + '</b>/4';
+        const cs = Math.max(2, +(app.dataset.cs || 8));   // осмини за текущия акорд
+        fine.innerHTML = 'такт <b>' + (b.i+1) + '</b>/' + b.n + ' · удар <b>' + (Math.floor(hit/2)+1) + '</b>/' + (cs/2);
       } else {
         delete app.dataset.slot;
       }

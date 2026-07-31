@@ -309,7 +309,11 @@ const CHORDS = {
   'F#m':   {f:[2,4,4,2,2,2], g:[1,3,4,1,1,1], barre:{fret:2,from:0,to:5}},
 
   /* --- ANCHOR ВЕРСИЯ: пръсти 3 и 4 остават заковани на B и e струна, 3-ти праг --- */
-  'G@':    {f:[3,2,0,0,3,3], g:[2,1,0,0,3,4], label:'G'}
+  'G@':    {f:[3,2,0,0,3,3], g:[2,1,0,0,3,4], label:'G'},
+
+  /* --- ДВУПРЪСТОВИ ФОРМИ: за първите песни, преди ръката да е укрепнала --- */
+  'Cmaj7': {f:[-1,3,2,0,0,0], g:[0,3,2,0,0,0]},   // замества C с два пръста
+  'G6':    {f:[3,2,0,0,0,0], g:[2,1,0,0,0,0]}     // "лесното G" с два пръста
 };
 
 /* Кой акорд с кой се заменя, когато Anchor chords е включено */
@@ -328,96 +332,73 @@ const P = {
 };
 
 /* ================= ПЕСНИ И УПРАЖНЕНИЯ ================= */
-const GE='EASY', GM='MEDIUM', GH='HARD', GF='FINGERSTYLE', GT='Преходи между акорди';
+const G1='1 · Пакети за смяна', G2='2 · Преходи един по един',
+      G3='3 · С два пръста', G4='4 · Лесни песни', G5='5 · Следваща стъпка';
+
+/* Групите, които се броят за упражнение по смяна на акорди:
+   винаги тръгват на 60 BPM и показват контрола "удари на акорд". */
+const SWITCH_GRPS = [G1, G2];
 
 const LIST = [
- /* ---------- EASY ---------- */
- {grp:GE, n:"Perfect — Ed Sheeran (Easiest)",   b:64, p:P.POP,    c:['G','Em','C','D']},
- {grp:GE, n:"Tennessee Whiskey — Chris Stapleton", b:50, p:P.BALLAD, c:['G','Am','G','Am']},
- {grp:GE, n:"Stand By Me — Ben E. King",        b:72, p:P.BALLAD, c:['G','G','Em','Em','C','D','G','G']},
- {grp:GE, n:"Wagon Wheel — Darius Rucker",      b:76, p:P.POP,    c:['G','D','Em','C']},
- {grp:GE, n:"Brown Eyed Girl — Van Morrison",   b:76, p:P.POP,    c:['G','C','G','D']},
- {grp:GE, n:"Revival — Zach Bryan",             b:80, p:P.POP,    c:['G','D','Em','C']},
- {grp:GE, n:"Heaven — Bryan Adams",             b:66, p:P.POP,    c:['G','D','Em','C']},
- {grp:GE, n:"Knockin' on Heaven's Door — Bob Dylan", b:60, p:P.HEAVEN, c:['G','D','Am','Am','G','D','C','C']},
- {grp:GE, n:"Leavin' On A Jet Plane — John Denver", b:72, p:P.FOLK, c:['G','C','G','C','G','C','D','D']},
- {grp:GE, n:"Ain't No Sunshine — Bill Withers", b:70, p:P.SIMPLE, c:['Am','Em','G','Am']},
- {grp:GE, n:"Chicken Fried — Zac Brown Band",   b:84, p:P.POP,    c:['G','C','G','D']},
- {grp:GE, n:"Learning to Fly — Tom Petty",      b:74, p:P.POP,    c:['F','C','Am','G']},
- {grp:GE, n:"Worst Way — Riley Green",          b:76, p:P.POP,    c:['G','D','Em','C']},
- {grp:GE, n:"I'm Yours — Jason Mraz",           b:76, p:P.POP,    c:['C','G','Am','F']},
- {grp:GE, n:"Take Me Home, Country Roads — John Denver", b:82, p:P.POP, c:['G','Em','D','C','G','D','G','G']},
- {grp:GE, n:"Mr. Jones — Counting Crows",       b:88, p:P.POP,    c:['Am','F','Dm','G']},
- {grp:GE, n:"Good Riddance — Green Day",        b:82, p:P.FOLK,   c:['G','C','D','D']},
- {grp:GE, n:"Every Rose Has Its Thorn — Poison",b:66, p:P.POP,    c:['G','C','G','D']},
+ /* ---------- 1 · ЧЕТИРИТЕ ПАКЕТА ---------- */
+ {grp:G1, n:"Пакет 1 — Закотвените 4",  b:60, p:P.DOWN, c:['G@','Cadd9','Em7','Dsus4']},
+ {grp:G1, n:"Пакет 2 — Големите 4",     b:60, p:P.DOWN, c:['G','C','Em','D']},
+ {grp:G1, n:"Пакет 3 — Фолк и поп",     b:60, p:P.DOWN, c:['Am','G','C','Fmaj7']},
+ {grp:G1, n:"Пакет 4 — Рок и кънтри",   b:60, p:P.DOWN, c:['G','D','A','Bm']},
 
- /* ---------- MEDIUM ---------- */
- {grp:GM, n:"Riptide — Vance Joy",              b:100,p:P.POP,    c:['Am','G','C','C']},
- {grp:GM, n:"Ring of Fire — Johnny Cash",       b:96, p:P.FOLK,   c:['G','C','G','G','D','C','G','G']},
- {grp:GM, n:"Folsom Prison Blues — Johnny Cash",b:100,p:P.ROCK,   c:['E','E','A','A','E','E','B7','E']},
- {grp:GM, n:"Drift Away — Uncle Kracker",       b:84, p:P.POP,    c:['G','C','G','D']},
- {grp:GM, n:"Can't Help Falling in Love — Elvis",b:56,p:P.BALLAD, c:['C','Em','Am','F','C','G','C','C']},
- {grp:GM, n:"Fast Car — Tracy Chapman",         b:100,p:P.POP,    c:['C','G','Em','D']},
- {grp:GM, n:"You're Still The One — Shania Twain",b:64,p:P.POP,   c:['C','F','C','G']},
- {grp:GM, n:"Free Fallin' — Tom Petty",         b:82, p:P.POP,    c:['D','A','G','A']},
- {grp:GM, n:"Hey, Soul Sister — Train",         b:97, p:P.POP,    c:['C','G','Am','F']},
- {grp:GM, n:"Hallelujah — Leonard Cohen",       b:56, p:P.BALLAD, c:['C','Am','C','Am','F','G','C','G']},
- {grp:GM, n:"Have You Ever Seen The Rain — CCR",b:88, p:P.POP,    c:['Am','F','C','G','C','G','F','C']},
- {grp:GM, n:"Hey There Delilah — Plain White T's",b:60,p:P.SIMPLE,c:['D','F#m','D','F#m']},
- {grp:GM, n:"Night Moves — Bob Seger",          b:80, p:P.FOLK,   c:['G','C','D','G']},
- {grp:GM, n:"Take It Easy — Eagles",            b:92, p:P.POP,    c:['G','D','C','G']},
- {grp:GM, n:"Wish You Were Here — Pink Floyd",  b:60, p:P.FOLK,   c:['C','D','Am','Am','C','D','G','G']},
- {grp:GM, n:"Blowin' in the Wind — Bob Dylan",  b:80, p:P.FOLK,   c:['G','C','G','G','C','D','G','G']},
+ /* ---------- 2 · ДВОЙКИТЕ ПООТДЕЛНО ----------
+    Редът е този, по който се учат: трите двойки, после цялото наведнъж. */
+ {grp:G2, n:"G ↔ Em",                   b:60, p:P.DOWN, c:['G','Em']},
+ {grp:G2, n:"Em ↔ C",                   b:60, p:P.DOWN, c:['Em','C']},
+ {grp:G2, n:"C ↔ D",                    b:60, p:P.DOWN, c:['C','D']},
+ {grp:G2, n:"G · Em · C · D",           b:60, p:P.DOWN, c:['G','Em','C','D']},
+ {grp:G2, n:"C ↔ G",                    b:60, p:P.DOWN, c:['C','G']},
+ {grp:G2, n:"D ↔ A",                    b:60, p:P.DOWN, c:['D','A']},
+ {grp:G2, n:"Am ↔ E",                   b:60, p:P.DOWN, c:['Am','E']},
+ {grp:G2, n:"Am ↔ F  (баре)",           b:60, p:P.DOWN, c:['Am','F']},
+ {grp:G2, n:"Bm ↔ G  (баре)",           b:60, p:P.DOWN, c:['Bm','G']},
 
- /* ---------- HARD ---------- */
- {grp:GH, n:"Starting Over — Chris Stapleton",  b:78, p:P.POP,    c:['G','D','Em','C']},
- {grp:GH, n:"Wonderwall — Oasis",               b:87, p:P.POP,    c:['Em7','G','Dsus4','A7sus4']},
- {grp:GH, n:"Landslide — Fleetwood Mac",        b:70, p:P.SIMPLE, c:['C','G','Am7','G']},
- {grp:GH, n:"Zombie — The Cranberries",         b:84, p:P.POP,    c:['Em','C','G','D']},
- {grp:GH, n:"A Horse With No Name",             b:80, p:P.POP,    c:['Em','D6/9','Em','D6/9']},
- {grp:GH, n:"Let It Be — The Beatles",          b:72, p:P.POP,    c:['C','G','Am','Fmaj7','C','G','F','C']},
- {grp:GH, n:"Bad Moon Rising — CCR",            b:90, p:P.FOLK,   c:['D','A','G','D','D','A','G','D']},
- {grp:GH, n:"Hey Jude — The Beatles",           b:74, p:P.POP,    c:['C','G','G7','C','F','C','G','C']},
- {grp:GH, n:"Sweet Home Alabama",               b:98, p:P.ROCK,   c:['D','Cadd9','G','G']},
- {grp:GH, n:"House of the Rising Sun",          b:70, p:P.FOLK,   c:['Am','C','D','F','Am','C','E','E']},
- {grp:GH, n:"Save Tonight (Am F C G)",          b:88, p:P.POP,    c:['Am','F','C','G']},
+ /* ---------- 3 · С ДВА ПРЪСТА ----------
+    Истински песни, свирими само с двупръстови форми - за първата седмица. */
+ {grp:G3, n:"A Horse With No Name",     b:80, p:P.POP,    c:['Em','D6/9','Em','D6/9']},
+ {grp:G3, n:"Eleanor Rigby — Beatles",  b:72, p:P.SIMPLE, c:['Em','Cmaj7','Em','Cmaj7']},
+ {grp:G3, n:"Achy Breaky Heart",        b:88, p:P.FOLK,   c:['A7','A7','E7','E7']},
+ {grp:G3, n:"Wild Thing — The Troggs",  b:84, p:P.ROCK,   c:['Asus2','Dsus2','E7','Dsus2']},
+ {grp:G3, n:"Chasing Cars — Snow Patrol",b:60,p:P.SIMPLE, c:['Asus2','E7','Dsus2','Asus2']},
+ {grp:G3, n:"Jambalaya — Hank Williams",b:90, p:P.FOLK,   c:['Cmaj7','Cmaj7','G6','Cmaj7']},
 
- /* ---------- FINGERSTYLE ---------- */
- {grp:GF, n:"Ain't No Sunshine — Bill Withers", b:64, p:P.SIMPLE, c:['Am','Em','G','Am']},
- {grp:GF, n:"Fast Car — Tracy Chapman",         b:66, p:P.SIMPLE, c:['C','G','Em','D']},
- {grp:GF, n:"Hey There Delilah — Plain White T's",b:58,p:P.SIMPLE,c:['D','F#m','D','F#m']},
- {grp:GF, n:"Hallelujah — Leonard Cohen",       b:52, p:P.SIMPLE, c:['C','Am','C','Am','F','G','C','G']},
- {grp:GF, n:"Can't Help Falling in Love — Elvis",b:50,p:P.SIMPLE, c:['C','Em','Am','F','C','G','C','C']},
- {grp:GF, n:"Landslide — Fleetwood Mac",        b:62, p:P.SIMPLE, c:['C','G','Am7','G']},
+ /* ---------- 4 · ЛЕСНИ ПЕСНИ ----------
+    Само отворени акорди: G C D Em Am. Без баре, без F. */
+ {grp:G4, n:"Perfect — Ed Sheeran",     b:64, p:P.POP,    c:['G','Em','C','D']},
+ {grp:G4, n:"Wagon Wheel — Darius Rucker", b:76, p:P.POP, c:['G','D','Em','C']},
+ {grp:G4, n:"Stand By Me — Ben E. King",b:72, p:P.BALLAD, c:['G','G','Em','Em','C','D','G','G']},
+ {grp:G4, n:"Country Roads — John Denver", b:82, p:P.POP, c:['G','Em','D','C','G','D','G','G']},
+ {grp:G4, n:"Brown Eyed Girl — Van Morrison", b:76, p:P.POP, c:['G','C','G','D']},
+ {grp:G4, n:"Zombie — The Cranberries", b:84, p:P.POP,    c:['Em','C','G','D']},
+ {grp:G4, n:"Knockin' on Heaven's Door",b:60, p:P.HEAVEN, c:['G','D','Am','Am','G','D','C','C']},
+ {grp:G4, n:"Tennessee Whiskey",        b:50, p:P.BALLAD, c:['G','Am','G','Am']},
+ {grp:G4, n:"Ain't No Sunshine",        b:70, p:P.SIMPLE, c:['Am','Em','G','Am']},
+ {grp:G4, n:"Good Riddance — Green Day",b:82, p:P.FOLK,   c:['G','C','D','D']},
+ {grp:G4, n:"Leavin' On A Jet Plane",   b:72, p:P.FOLK,   c:['G','C','G','C','G','C','D','D']},
+ {grp:G4, n:"Riptide — Vance Joy",      b:100,p:P.POP,    c:['Am','G','C','C']},
+ {grp:G4, n:"Sweet Home Alabama",       b:98, p:P.ROCK,   c:['D','Cadd9','G','G']},
+ {grp:G4, n:"Bad Moon Rising — CCR",    b:90, p:P.FOLK,   c:['D','A','G','D']},
+ {grp:G4, n:"Blowin' in the Wind — Dylan", b:80, p:P.FOLK, c:['G','C','G','G','C','D','G','G']},
 
- /* ---------- ПРЕХОДИ МЕЖДУ АКОРДИ ----------
-    Първите четири са редът, който се препоръчва на начинаещи: трите двойки
-    поотделно, после цялата прогресия наведнъж. */
- {grp:GT, n:"G ↔ Em  (1)",      b:50, p:P.DOWN, c:['G','Em']},
- {grp:GT, n:"Em ↔ C  (2)",      b:50, p:P.DOWN, c:['Em','C']},
- {grp:GT, n:"C ↔ D  (3)",       b:50, p:P.DOWN, c:['C','D']},
- {grp:GT, n:"G · Em · C · D  (цялата)", b:55, p:P.DOWN, c:['G','Em','C','D']},
-
- {grp:GT, n:"Пакет: Големите 4 (G C Em D)", b:55, p:P.DOWN, c:['G','C','Em','D']},
- {grp:GT, n:"Пакет: Фолк и поп (Am G C Fmaj7)", b:55, p:P.DOWN, c:['Am','G','C','Fmaj7']},
- {grp:GT, n:"Пакет: Рок и кънтри (G D A Bm)", b:50, p:P.DOWN, c:['G','D','A','Bm']},
-
- {grp:GT, n:"G ↔ C",            b:50, p:P.DOWN, c:['G','C']},
- {grp:GT, n:"G ↔ D",            b:50, p:P.DOWN, c:['G','D']},
- {grp:GT, n:"C ↔ Am",           b:50, p:P.DOWN, c:['C','Am']},
- {grp:GT, n:"C ↔ G",            b:50, p:P.DOWN, c:['C','G']},
- {grp:GT, n:"Am ↔ E",           b:50, p:P.DOWN, c:['Am','E']},
- {grp:GT, n:"Am ↔ F",           b:45, p:P.DOWN, c:['Am','F']},
- {grp:GT, n:"D ↔ A",            b:50, p:P.DOWN, c:['D','A']},
- {grp:GT, n:"Em ↔ G",           b:55, p:P.DOWN, c:['Em','G']},
- {grp:GT, n:"E ↔ A ↔ D",        b:52, p:P.DOWN, c:['E','A','D']},
- {grp:GT, n:"G · D · Am · C",   b:55, p:P.DOWN, c:['G','D','Am','C']},
- {grp:GT, n:"C · G · Am · F",   b:55, p:P.DOWN, c:['C','G','Am','F']},
- {grp:GT, n:"C · Am · F · G",   b:55, p:P.DOWN, c:['C','Am','F','G']},
- {grp:GT, n:"Баре F ↔ C",       b:42, p:P.SIMPLE, c:['F','C']},
- {grp:GT, n:"Баре Bm ↔ G",      b:45, p:P.SIMPLE, c:['Bm','G']},
- {grp:GT, n:"D · Dsus4 · D · Dsus2", b:60, p:P.FOLK, c:['D','Dsus4','D','Dsus2']},
- {grp:GT, n:"12-тактов блус в A", b:80, p:P.ROCK, c:['A','A','A','A','D','D','A','A','E','D','A','E']}
+ /* ---------- 5 · СЛЕДВАЩА СТЪПКА ----------
+    Появяват се F, Bm, F#m и по-дълги последователности. */
+ {grp:G5, n:"Let It Be — The Beatles",  b:72, p:P.POP,    c:['C','G','Am','Fmaj7','C','G','F','C']},
+ {grp:G5, n:"I'm Yours — Jason Mraz",   b:76, p:P.POP,    c:['C','G','Am','F']},
+ {grp:G5, n:"Hallelujah — Leonard Cohen", b:56, p:P.BALLAD, c:['C','Am','C','Am','F','G','C','G']},
+ {grp:G5, n:"Save Tonight",             b:88, p:P.POP,    c:['Am','F','C','G']},
+ {grp:G5, n:"House of the Rising Sun",  b:70, p:P.FOLK,   c:['Am','C','D','F','Am','C','E','E']},
+ {grp:G5, n:"Can't Help Falling in Love",b:56,p:P.BALLAD, c:['C','Em','Am','F','C','G','C','C']},
+ {grp:G5, n:"Have You Ever Seen The Rain", b:88, p:P.POP, c:['Am','F','C','G','C','G','F','C']},
+ {grp:G5, n:"Hey There Delilah",        b:60, p:P.SIMPLE, c:['D','F#m','D','F#m']},
+ {grp:G5, n:"Wonderwall — Oasis",       b:87, p:P.POP,    c:['Em7','G','Dsus4','A7sus4']},
+ {grp:G5, n:"Wish You Were Here",       b:60, p:P.FOLK,   c:['C','D','Am','Am','C','D','G','G']},
+ {grp:G5, n:"Folsom Prison Blues",      b:100,p:P.ROCK,   c:['E','E','A','A','E','E','B7','E']},
+ {grp:G5, n:"Hotel-стил блус в A",      b:80, p:P.ROCK,   c:['A','A','A','A','D','D','A','A','E','D','A','E']}
 ];
 
 /* ================= ДИАГРАМА ================= */
@@ -730,7 +711,7 @@ function buildSelect(){
    (4 удара), защото прогресията им е музикална и не бива да се реже. */
 let beatsPer = 4, beatsRandom = false, curSlots = 8;
 
-function isSwitch(){ return !!(cur && cur.grp === GT); }
+function isSwitch(){ return !!(cur && SWITCH_GRPS.includes(cur.grp)); }
 
 function pickSlots(){
   if(!isSwitch()) return 8;                       // цял такт за песните
@@ -760,7 +741,7 @@ function load(i){
   stop();
   cur = JSON.parse(JSON.stringify(LIST[i]));
   // упражненията за смяна на акорди винаги тръгват от 60 BPM
-  if(cur.grp === GT) cur.b = 60;
+  if(SWITCH_GRPS.includes(cur.grp)) cur.b = 60;
   bpm = cur.b; $('bpm').value = bpm; $('bpmVal').textContent = bpm;
   bar = 0; slot = 0; curSlots = pickSlots();
   renderAnchorBtn(); renderBeats(); renderDots(); renderChords(); renderStrum(); syncBpmReset();

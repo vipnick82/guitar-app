@@ -254,7 +254,9 @@ const CHORDS = {
   'C':     {f:[-1,3,2,0,1,0], g:[0,3,2,0,1,0]},
   'Cadd9': {f:[-1,3,2,0,3,3], g:[0,2,1,0,3,4]},
   'D':     {f:[-1,-1,0,2,3,2], g:[0,0,0,1,3,2]},
-  'Dsus4': {f:[-1,-1,0,2,3,3], g:[0,0,0,1,3,4]},
+  /* Dsus4 като anchor версия на D: пръсти 3 и 4 остават заковани на 3-ти праг
+     (B и e струна), затова 2-ри праг се хваща с пръст 2, а не с 1. */
+  'Dsus4': {f:[-1,-1,0,2,3,3], g:[0,0,0,2,3,4]},
   'Dsus2': {f:[-1,-1,0,2,3,0], g:[0,0,0,1,2,0]},
   /* D6/9 в пълния вид от записа на A Horse With No Name — F# в баса.
      Пръсти 2 и 3 стоят на 2-ри праг, точно както в Em, само една струна встрани. */
@@ -361,7 +363,18 @@ const LIST = [
  {grp:GF, n:"Can't Help Falling in Love — Elvis",b:50,p:P.SIMPLE, c:['C','Em','Am','F','C','G','C','C']},
  {grp:GF, n:"Landslide — Fleetwood Mac",        b:62, p:P.SIMPLE, c:['C','G','Am7','G']},
 
- /* ---------- ПРЕХОДИ МЕЖДУ АКОРДИ ---------- */
+ /* ---------- ПРЕХОДИ МЕЖДУ АКОРДИ ----------
+    Първите четири са редът, който се препоръчва на начинаещи: трите двойки
+    поотделно, после цялата прогресия наведнъж. */
+ {grp:GT, n:"G ↔ Em  (1)",      b:50, p:P.DOWN, c:['G','Em']},
+ {grp:GT, n:"Em ↔ C  (2)",      b:50, p:P.DOWN, c:['Em','C']},
+ {grp:GT, n:"C ↔ D  (3)",       b:50, p:P.DOWN, c:['C','D']},
+ {grp:GT, n:"G · Em · C · D  (цялата)", b:55, p:P.DOWN, c:['G','Em','C','D']},
+
+ {grp:GT, n:"Пакет: Големите 4 (G C Em D)", b:55, p:P.DOWN, c:['G','C','Em','D']},
+ {grp:GT, n:"Пакет: Фолк и поп (Am G C Fmaj7)", b:55, p:P.DOWN, c:['Am','G','C','Fmaj7']},
+ {grp:GT, n:"Пакет: Рок и кънтри (G D A Bm)", b:50, p:P.DOWN, c:['G','D','A','Bm']},
+
  {grp:GT, n:"G ↔ C",            b:50, p:P.DOWN, c:['G','C']},
  {grp:GT, n:"G ↔ D",            b:50, p:P.DOWN, c:['G','D']},
  {grp:GT, n:"C ↔ Am",           b:50, p:P.DOWN, c:['C','Am']},
@@ -449,7 +462,23 @@ const EXTRA_SMP = {
   'C4':60,'Cs4':61,'D4':62,'F4':65,'Fs4':66,'G4':67,'Gs4':68
 };
 
-let ac=null, master=null, dryBus=null, active=[];
+/* ---------- тонална корекция ----------
+   Мострите на tonejs са ярки стоманени струни. Референтният звук, който
+   харесваме, е измеримо по-тъмен: спектрален центроид ~236 Hz и съотношение
+   ниски(80-1k) към високи(1k-8k) около 75:1, докато суровата мостра е под 1:1.
+   Каскада от два меки lowpass-а сваля блясъка на перцето, без да пипа тялото.
+
+   ПО-ТЪМНО  → намали двете числа (напр. 850 / 1150)
+   ПО-ЯРКО   → увеличи ги (напр. 1400 / 2200)                                */
+const TONE_LP1 = 1000;
+const TONE_LP2 = 1400;
+
+/* Колко дълго звучи една струна, преди сама да заглъхне (сек).
+   Референтният звук заглъхва напълно за ~1.05 s - иначе акордите се наслагват. */
+const NOTE_HOLD  = 0.70;   // пълно ниво дотук
+const NOTE_FADE  = 0.17;   // след това експоненциално заглъхва с тази константа
+
+let ac=null, master=null, dryBus=null, toneBus=null, active=[];
 const smp = new Map();                        // midi → AudioBuffer
 let coreReady = false, loadFailed = false, loadingCore = null;
 
@@ -466,9 +495,25 @@ function initAudio(){
 
   master = ac.createGain(); master.gain.value = 0.9; master.connect(out);
 
+  /* китарна шина: dryBus → LP1 → LP2 → (master + reverb send)
+     Метрономът НЕ минава оттук, за да си остане ясен.                        */
+  dryBus = ac.createGain(); dryBus.gain.value = 1.0;
+
+  const lp1 = ac.createBiquadFilter();
+  lp1.type='lowpass'; lp1.frequency.value = TONE_LP1; lp1.Q.value = 0.707;
+  const lp2 = ac.createBiquadFilter();
+  lp2.type='lowpass'; lp2.frequency.value = TONE_LP2; lp2.Q.value = 0.707;
+
+  // лек топъл акцент в тялото, там където е 88% от енергията на референцията
+  const body = ac.createBiquadFilter();
+  body.type='peaking'; body.frequency.value = 190; body.Q.value = 0.8; body.gain.value = 2.0;
+
+  dryBus.connect(lp1); lp1.connect(lp2); lp2.connect(body);
+  toneBus = body;
+  toneBus.connect(master);
+
   // мострите вече носят звука на дървото — само лек цъфтеж въздух в стаята
-  dryBus = ac.createGain(); dryBus.gain.value = 1.0; dryBus.connect(master);
-  const send = ac.createGain(); send.gain.value = 0.12; dryBus.connect(send);
+  const send = ac.createGain(); send.gain.value = 0.085; toneBus.connect(send);
   const verb = ac.createConvolver(); verb.buffer = roomIR(1.3, 3.0, 0.45);
   send.connect(verb); verb.connect(master);
 }
@@ -545,12 +590,23 @@ function playString(t, midi, openMidi, gain){
   src.buffer = s.buf;
   // ключовата формула: транспониране спрямо прага
   src.playbackRate.value = Math.pow(2, (midi - s.midi)/12) * (1 + (Math.random()-0.5)*0.0012);
+
+  // g   — управлява се от mute() при смяна на акорд
+  // dec — естественото заглъхване на струната; отделен възел, за да не се бият
   const g = ac.createGain();
   g.gain.setValueAtTime(0.0001, t);
   g.gain.linearRampToValueAtTime(gain, t+0.004);
-  src.connect(g); g.connect(dryBus);
+
+  const dec = ac.createGain();
+  dec.gain.setValueAtTime(1, t);
+  dec.gain.setValueAtTime(1, t + NOTE_HOLD);
+  dec.gain.setTargetAtTime(0.0001, t + NOTE_HOLD, NOTE_FADE);
+
+  src.connect(g); g.connect(dec); dec.connect(dryBus);
   src.start(t);
-  const node = {g:g, target:gain, end:t + s.buf.duration/src.playbackRate.value};
+  const stopAt = Math.min(t + s.buf.duration/src.playbackRate.value, t + NOTE_HOLD + NOTE_FADE*7);
+  try{ src.stop(stopAt); }catch(e){}
+  const node = {g:g, target:gain, end:stopAt};
   active.push(node);
   src.onended = ()=>{ const i=active.indexOf(node); if(i>=0) active.splice(i,1); };
 }
@@ -579,7 +635,9 @@ function strum(t, name, dir, accent){
 
   const idx=[]; for(let i=0;i<6;i++) if(c.f[i]>=0) idx.push(i);
   const order = dir==='U' ? idx.slice().reverse() : idx;             // надолу от басите, нагоре от високите
-  const spread = (dir==='U' ? 0.0105 : 0.016) * (accent?0.88:1) * (0.92+Math.random()*0.16);
+  /* Разстилане на удара. Измерено на референцията: ~5.6 ms между струните,
+     ~28 ms общо за 6 струни. По-стегнато = звучи като удар, не като арпеджио. */
+  const spread = (dir==='U' ? 0.0048 : 0.0056) * (accent?0.88:1) * (0.92+Math.random()*0.16);
   const base = (dir==='U' ? 0.42 : 0.55) * (accent?1.14:1);
   order.forEach((s,k)=>{
     const tilt = dir==='U' ? (1-k*0.10) : (1-k*0.06);
@@ -589,14 +647,19 @@ function strum(t, name, dir, accent){
   });
 }
 
+/* Метрономът на референцията е мек, дървен клик: центроид ~648 Hz и нищо
+   осезаемо над 2.8 kHz — не е острото "пиик" на чист синус на 1.5 kHz. */
 function click(t, accent){
-  const o = ac.createOscillator(), g = ac.createGain(), f = ac.createBiquadFilter();
-  o.type='sine'; o.frequency.value = accent?1500:1000;
-  f.type='bandpass'; f.frequency.value = accent?1500:1000; f.Q.value=1.2;
+  const o = ac.createOscillator(), g = ac.createGain(),
+        f = ac.createBiquadFilter(), lp = ac.createBiquadFilter();
+  o.type='sine'; o.frequency.value = accent?880:660;
+  f.type='bandpass'; f.frequency.value = accent?880:660; f.Q.value=1.1;
+  lp.type='lowpass'; lp.frequency.value = 2000; lp.Q.value=0.707;
   g.gain.setValueAtTime(0.0001,t);
-  g.gain.exponentialRampToValueAtTime(accent?0.20:0.10,t+0.001);
-  g.gain.exponentialRampToValueAtTime(0.0001,t+0.05);
-  o.connect(f); f.connect(g); g.connect(master); o.start(t); o.stop(t+0.07);
+  g.gain.exponentialRampToValueAtTime(accent?0.19:0.095,t+0.0015);
+  g.gain.exponentialRampToValueAtTime(0.0001,t+0.055);
+  o.connect(f); f.connect(lp); lp.connect(g); g.connect(master);
+  o.start(t); o.stop(t+0.08);
 }
 
 function prewarm(){ /* мострите се кешират глобално — няма какво да се подгрява */ }

@@ -179,6 +179,12 @@ button,select,.beat,input[type=range]{touch-action:manipulation;font-family:inhe
  background:linear-gradient(180deg,#103a26,#0b2418);
  box-shadow:0 0 14px rgba(41,240,147,.14),inset 0 1px 0 rgba(41,240,147,.18)}
 
+/* празен (призрачен) удар - ръката се движи, но не докосва струните */
+.beat.ghost{color:#2b2b2b;background:linear-gradient(180deg,#0e0e0e,#0a0a0a);border-color:#1a1a1a}
+.ghostNote{display:flex;align-items:center;gap:6px;margin-top:7px;font-size:9.5px;letter-spacing:.3px;color:#4a4a4a}
+.ghostNote .gs{width:9px;height:9px;border-radius:3px;flex:0 0 auto;
+ background:linear-gradient(180deg,#0e0e0e,#0a0a0a);border:1px solid #1f1f1f}
+
 /* ударите извън обхвата на текущия акорд стоят приглушени */
 .beat.off{opacity:.2}
 .app[data-lim="2"] .counts span:nth-child(n+3),
@@ -230,7 +236,7 @@ button,select,.beat,input[type=range]{touch-action:manipulation;font-family:inhe
   <div class="anchorWrap"><button class="anchor" id="anchorBtn"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.6"/><line x1="12" y1="22" x2="12" y2="7.6"/><path d="M4.8 12H2a10 10 0 0 0 20 0h-2.8"/></svg><span>Anchor chords</span></button></div>
 
   <section class="card chordCard">
-    <div class="cardHead"><span class="label">ПОСЛЕДОВАТЕЛНОСТ</span><span class="fine" id="fineBar">такт —/—</span></div>
+    <div class="cardHead"><span class="label">ПОСЛЕДОВАТЕЛНОСТ</span><span class="fine" id="fineBar">такт -/-</span></div>
     <div class="dots" id="dots"></div>
     <div class="pulseRing"></div>
     <div class="chords" id="chords"></div>
@@ -240,6 +246,7 @@ button,select,.beat,input[type=range]{touch-action:manipulation;font-family:inhe
     <div class="cardHead"><span class="label">STRUMMING PATTERN</span></div>
     <div class="strum" id="strum"></div>
     <div class="counts"><span class="n">1</span><span>&amp;</span><span class="n">2</span><span>&amp;</span><span class="n">3</span><span>&amp;</span><span class="n">4</span><span>&amp;</span></div>
+    <div class="ghostNote"><span class="gs"></span>празен удар - ръката минава, но не докосва струните</div>
   </section>
 
   <section class="card">
@@ -254,7 +261,7 @@ button,select,.beat,input[type=range]{touch-action:manipulation;font-family:inhe
       <span class="label">УДАРИ НА АКОРД</span>
       <div class="beats" id="beats">
         <button data-bp="1">1</button><button data-bp="2">2</button><button data-bp="4">4</button>
-        <button data-bp="r" title="На случаен принцип" aria-label="На случаен принцип"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg></button>
+        <button id="shufBtn" title="Разбъркан ред на акордите" aria-label="Разбъркан ред на акордите"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg></button>
       </div>
     </div>
 
@@ -285,7 +292,7 @@ const CHORDS = {
      (B и e струна), затова 2-ри праг се хваща с пръст 2, а не с 1. */
   'Dsus4': {f:[-1,-1,0,2,3,3], g:[0,0,0,2,3,4]},
   'Dsus2': {f:[-1,-1,0,2,3,0], g:[0,0,0,1,2,0]},
-  /* D6/9 в пълния вид от записа на A Horse With No Name — F# в баса.
+  /* D6/9 в пълния вид от записа на A Horse With No Name - F# в баса.
      Пръсти 2 и 3 стоят на 2-ри праг, точно както в Em, само една струна встрани. */
   'D6/9':  {f:[2,0,0,2,0,0], g:[2,0,0,3,0,0]},
   'Dm':    {f:[-1,-1,0,2,3,1], g:[0,0,0,2,3,1]},
@@ -323,8 +330,9 @@ const A = n => (anchorOn && ANCHOR[n]) ? ANCHOR[n] : n;
 
 const P = {
   DOWN:   ['D','-','D','-','D','-','D','-'],
-  POP:    ['D','-','D','U','-','U','D','U'],
-  HEAVEN: ['D','-','-','-','D','-','D','U'],
+  POP:    ['D','-','D','U','-','U','D','U'],   // патерн 1
+  P2:     ['D','-','D','-','-','U','D','U'],   // патерн 2
+  HEAVEN: ['D','-','-','-','D','-','D','U'],   // патерн 3
   FOLK:   ['D','-','D','U','D','-','D','U'],
   SIMPLE: ['D','-','-','-','D','-','-','-'],
   ROCK:   ['D','-','D','U','D','U','D','U'],
@@ -332,8 +340,8 @@ const P = {
 };
 
 /* ================= ПЕСНИ И УПРАЖНЕНИЯ ================= */
-const G1='1 · Пакети за смяна', G2='2 · Преходи един по един',
-      G3='3 · С два пръста', G4='4 · Лесни песни', G5='5 · Следваща стъпка';
+const G1='1 · Пакети за смяна', G2='2 · Преходи един по един', GS='3 · Стръминг',
+      G3='4 · С два пръста', G4='5 · Лесни песни', G5='6 · Следваща стъпка';
 
 /* Групите, които се броят за упражнение по смяна на акорди:
    винаги тръгват на 60 BPM и показват контрола "удари на акорд". */
@@ -341,10 +349,10 @@ const SWITCH_GRPS = [G1, G2];
 
 const LIST = [
  /* ---------- 1 · ЧЕТИРИТЕ ПАКЕТА ---------- */
- {grp:G1, n:"Пакет 1 — Закотвените 4",  b:60, p:P.DOWN, c:['G@','Cadd9','Em7','Dsus4']},
- {grp:G1, n:"Пакет 2 — Големите 4",     b:60, p:P.DOWN, c:['G','C','Em','D']},
- {grp:G1, n:"Пакет 3 — Фолк и поп",     b:60, p:P.DOWN, c:['Am','G','C','Fmaj7']},
- {grp:G1, n:"Пакет 4 — Рок и кънтри",   b:60, p:P.DOWN, c:['G','D','A','Bm']},
+ {grp:G1, n:"Пакет 1 - Закотвените 4",  b:60, p:P.DOWN, c:['G@','Cadd9','Em7','Dsus4']},
+ {grp:G1, n:"Пакет 2 - Големите 4",     b:60, p:P.DOWN, c:['G','C','Em','D']},
+ {grp:G1, n:"Пакет 3 - Фолк и поп",     b:60, p:P.DOWN, c:['Am','G','C','Fmaj7']},
+ {grp:G1, n:"Пакет 4 - Рок и кънтри",   b:60, p:P.DOWN, c:['G','D','A','Bm']},
 
  /* ---------- 2 · ДВОЙКИТЕ ПООТДЕЛНО ----------
     Редът е този, по който се учат: трите двойки, после цялото наведнъж. */
@@ -358,44 +366,57 @@ const LIST = [
  {grp:G2, n:"Am ↔ F  (баре)",           b:60, p:P.DOWN, c:['Am','F']},
  {grp:G2, n:"Bm ↔ G  (баре)",           b:60, p:P.DOWN, c:['Bm','G']},
 
- /* ---------- 3 · С ДВА ПРЪСТА ----------
+ /* ---------- 3 · СТРЪМИНГ ----------
+    Едно и също движение при всички патерни: ръката бие осмини непрекъснато,
+    а разликата е само кои удари докосват струните. Първите четири са на един
+    акорд, за да е цялото внимание в дясната ръка. */
+ {grp:GS, n:"Само надолу - D-D-D-D-",   b:60, p:P.DOWN,   c:['G']},
+ {grp:GS, n:"Патерн 1 - D-DU-UDU",      b:60, p:P.POP,    c:['G']},
+ {grp:GS, n:"Патерн 2 - D-D--UDU",      b:60, p:P.P2,     c:['G']},
+ {grp:GS, n:"Патерн 3 - D---D-DU",      b:60, p:P.HEAVEN, c:['G']},
+ {grp:GS, n:"Патерн 1 + смяна G-C",     b:60, p:P.POP,    c:['G','C']},
+ {grp:GS, n:"Патерн 2 + смяна G-C",     b:60, p:P.P2,     c:['G','C']},
+ {grp:GS, n:"Патерн 1 + G-Em-C-D",      b:65, p:P.POP,    c:['G','Em','C','D']},
+ {grp:GS, n:"Патерн 3 + G-Em-C-D",      b:65, p:P.HEAVEN, c:['G','Em','C','D']},
+
+ /* ---------- 4 · С ДВА ПРЪСТА ----------
     Истински песни, свирими само с двупръстови форми - за първата седмица. */
  {grp:G3, n:"A Horse With No Name",     b:80, p:P.POP,    c:['Em','D6/9','Em','D6/9']},
- {grp:G3, n:"Eleanor Rigby — Beatles",  b:72, p:P.SIMPLE, c:['Em','Cmaj7','Em','Cmaj7']},
+ {grp:G3, n:"Eleanor Rigby - Beatles",  b:72, p:P.SIMPLE, c:['Em','Cmaj7','Em','Cmaj7']},
  {grp:G3, n:"Achy Breaky Heart",        b:88, p:P.FOLK,   c:['A7','A7','E7','E7']},
- {grp:G3, n:"Wild Thing — The Troggs",  b:84, p:P.ROCK,   c:['Asus2','Dsus2','E7','Dsus2']},
- {grp:G3, n:"Chasing Cars — Snow Patrol",b:60,p:P.SIMPLE, c:['Asus2','E7','Dsus2','Asus2']},
- {grp:G3, n:"Jambalaya — Hank Williams",b:90, p:P.FOLK,   c:['Cmaj7','Cmaj7','G6','Cmaj7']},
+ {grp:G3, n:"Wild Thing - The Troggs",  b:84, p:P.ROCK,   c:['Asus2','Dsus2','E7','Dsus2']},
+ {grp:G3, n:"Chasing Cars - Snow Patrol",b:60,p:P.SIMPLE, c:['Asus2','E7','Dsus2','Asus2']},
+ {grp:G3, n:"Jambalaya - Hank Williams",b:90, p:P.FOLK,   c:['Cmaj7','Cmaj7','G6','Cmaj7']},
 
- /* ---------- 4 · ЛЕСНИ ПЕСНИ ----------
+ /* ---------- 5 · ЛЕСНИ ПЕСНИ ----------
     Само отворени акорди: G C D Em Am. Без баре, без F. */
- {grp:G4, n:"Perfect — Ed Sheeran",     b:64, p:P.POP,    c:['G','Em','C','D']},
- {grp:G4, n:"Wagon Wheel — Darius Rucker", b:76, p:P.POP, c:['G','D','Em','C']},
- {grp:G4, n:"Stand By Me — Ben E. King",b:72, p:P.BALLAD, c:['G','G','Em','Em','C','D','G','G']},
- {grp:G4, n:"Country Roads — John Denver", b:82, p:P.POP, c:['G','Em','D','C','G','D','G','G']},
- {grp:G4, n:"Brown Eyed Girl — Van Morrison", b:76, p:P.POP, c:['G','C','G','D']},
- {grp:G4, n:"Zombie — The Cranberries", b:84, p:P.POP,    c:['Em','C','G','D']},
+ {grp:G4, n:"Perfect - Ed Sheeran",     b:64, p:P.POP,    c:['G','Em','C','D']},
+ {grp:G4, n:"Wagon Wheel - Darius Rucker", b:76, p:P.POP, c:['G','D','Em','C']},
+ {grp:G4, n:"Stand By Me - Ben E. King",b:72, p:P.BALLAD, c:['G','G','Em','Em','C','D','G','G']},
+ {grp:G4, n:"Country Roads - John Denver", b:82, p:P.POP, c:['G','Em','D','C','G','D','G','G']},
+ {grp:G4, n:"Brown Eyed Girl - Van Morrison", b:76, p:P.POP, c:['G','C','G','D']},
+ {grp:G4, n:"Zombie - The Cranberries", b:84, p:P.POP,    c:['Em','C','G','D']},
  {grp:G4, n:"Knockin' on Heaven's Door",b:60, p:P.HEAVEN, c:['G','D','Am','Am','G','D','C','C']},
  {grp:G4, n:"Tennessee Whiskey",        b:50, p:P.BALLAD, c:['G','Am','G','Am']},
  {grp:G4, n:"Ain't No Sunshine",        b:70, p:P.SIMPLE, c:['Am','Em','G','Am']},
- {grp:G4, n:"Good Riddance — Green Day",b:82, p:P.FOLK,   c:['G','C','D','D']},
+ {grp:G4, n:"Good Riddance - Green Day",b:82, p:P.FOLK,   c:['G','C','D','D']},
  {grp:G4, n:"Leavin' On A Jet Plane",   b:72, p:P.FOLK,   c:['G','C','G','C','G','C','D','D']},
- {grp:G4, n:"Riptide — Vance Joy",      b:100,p:P.POP,    c:['Am','G','C','C']},
+ {grp:G4, n:"Riptide - Vance Joy",      b:100,p:P.POP,    c:['Am','G','C','C']},
  {grp:G4, n:"Sweet Home Alabama",       b:98, p:P.ROCK,   c:['D','Cadd9','G','G']},
- {grp:G4, n:"Bad Moon Rising — CCR",    b:90, p:P.FOLK,   c:['D','A','G','D']},
- {grp:G4, n:"Blowin' in the Wind — Dylan", b:80, p:P.FOLK, c:['G','C','G','G','C','D','G','G']},
+ {grp:G4, n:"Bad Moon Rising - CCR",    b:90, p:P.FOLK,   c:['D','A','G','D']},
+ {grp:G4, n:"Blowin' in the Wind - Dylan", b:80, p:P.FOLK, c:['G','C','G','G','C','D','G','G']},
 
- /* ---------- 5 · СЛЕДВАЩА СТЪПКА ----------
+ /* ---------- 6 · СЛЕДВАЩА СТЪПКА ----------
     Появяват се F, Bm, F#m и по-дълги последователности. */
- {grp:G5, n:"Let It Be — The Beatles",  b:72, p:P.POP,    c:['C','G','Am','Fmaj7','C','G','F','C']},
- {grp:G5, n:"I'm Yours — Jason Mraz",   b:76, p:P.POP,    c:['C','G','Am','F']},
- {grp:G5, n:"Hallelujah — Leonard Cohen", b:56, p:P.BALLAD, c:['C','Am','C','Am','F','G','C','G']},
+ {grp:G5, n:"Let It Be - The Beatles",  b:72, p:P.POP,    c:['C','G','Am','Fmaj7','C','G','F','C']},
+ {grp:G5, n:"I'm Yours - Jason Mraz",   b:76, p:P.POP,    c:['C','G','Am','F']},
+ {grp:G5, n:"Hallelujah - Leonard Cohen", b:56, p:P.BALLAD, c:['C','Am','C','Am','F','G','C','G']},
  {grp:G5, n:"Save Tonight",             b:88, p:P.POP,    c:['Am','F','C','G']},
  {grp:G5, n:"House of the Rising Sun",  b:70, p:P.FOLK,   c:['Am','C','D','F','Am','C','E','E']},
  {grp:G5, n:"Can't Help Falling in Love",b:56,p:P.BALLAD, c:['C','Em','Am','F','C','G','C','C']},
  {grp:G5, n:"Have You Ever Seen The Rain", b:88, p:P.POP, c:['Am','F','C','G','C','G','F','C']},
  {grp:G5, n:"Hey There Delilah",        b:60, p:P.SIMPLE, c:['D','F#m','D','F#m']},
- {grp:G5, n:"Wonderwall — Oasis",       b:87, p:P.POP,    c:['Em7','G','Dsus4','A7sus4']},
+ {grp:G5, n:"Wonderwall - Oasis",       b:87, p:P.POP,    c:['Em7','G','Dsus4','A7sus4']},
  {grp:G5, n:"Wish You Were Here",       b:60, p:P.FOLK,   c:['C','D','Am','Am','C','D','G','G']},
  {grp:G5, n:"Folsom Prison Blues",      b:100,p:P.ROCK,   c:['E','E','A','A','E','E','B7','E']},
  {grp:G5, n:"Hotel-стил блус в A",      b:80, p:P.ROCK,   c:['A','A','A','A','D','D','A','A','E','D','A','E']}
@@ -447,14 +468,14 @@ const $ = id => document.getElementById(id);
    Никакъв синтез. Всяка нота е реален запис на стоманена акустична китара
    (tonejs-instruments / nbrosowsky, GitHub Pages, CORS отворен).
 
-   • Базата са 6-те отворени струни E2 A2 D3 G3 B3 E4 — зареждат се първи,
+   • Базата са 6-те отворени струни E2 A2 D3 G3 B3 E4 - зареждат се първи,
      за да може да се свири веднага.
    • playbackRate = Math.pow(2, fret/12) спрямо праговете в масива f.
    • Във фонов режим се дозареждат и междинните ноти; щом пристигнат,
      двигателят взима най-близката мостра и транспонирането пада под 1 полутон
      (по-малко транспониране = по-малко изкривяване на дървения тембър). */
 
-/* КОЯ КИТАРА СВИРИ — смени само този ред:
+/* КОЯ КИТАРА СВИРИ - смени само този ред:
      'nylon'    найлонови струни. Топъл, кръгъл тон - спектърът им съвпада с
                 референтния запис (центроид ~230 Hz), но атаката е запазена,
                 затова звучи топло И ясно, за разлика от филтрувана мостра.
@@ -486,16 +507,16 @@ const SMP_HOSTS = [
 
 const OPEN = [40,45,50,55,59,64];            // MIDI на празните струни (E2 A2 D3 G3 B3 E4)
 
-const CORE_SMP  = SMP_SET.core;              // шестте отворени струни — задължителни
-const EXTRA_SMP = SMP_SET.extra;             // междинните — само подобряват качеството
+const CORE_SMP  = SMP_SET.core;              // шестте отворени струни - задължителни
+const EXTRA_SMP = SMP_SET.extra;             // междинните - само подобряват качеството
 
 /* ---------- тонална корекция ----------
    ВАЖНО: топлината идва от САМИТЕ мостри (найлонови струни), не от филтър.
-   Агресивното нискочестотно филтриране на ярка мостра дава друго нещо — то
+   Агресивното нискочестотно филтриране на ярка мостра дава друго нещо - то
    реже атаката на перцето, която носи яснотата, и звучи приглушено.
    Затова тук остават само две дискретни корекции:
-     • highpass — маха тътена под най-ниската струна, това ЧИСТИ звука
-     • лек shelf — сваля само съскането от mp3 компресията и транспонирането
+     • highpass - маха тътена под най-ниската струна, това ЧИСТИ звука
+     • лек shelf - сваля само съскането от mp3 компресията и транспонирането
 
    ПО-ЯРКО → вдигни TONE_SHELF_DB към 0    ПО-МЕКО → свали го към -6          */
 const TONE_HP       = 70;     // под E2 (82 Hz) няма полезен звук, само тътен
@@ -542,7 +563,7 @@ function initAudio(){
   toneBus = shelf;
   toneBus.connect(master);
 
-  // мострите вече носят звука на дървото — само лек цъфтеж въздух в стаята
+  // мострите вече носят звука на дървото - само лек цъфтеж въздух в стаята
   const send = ac.createGain(); send.gain.value = 0.085; toneBus.connect(send);
   const verb = ac.createConvolver(); verb.buffer = roomIR(1.3, 3.0, 0.45);
   send.connect(verb); verb.connect(master);
@@ -591,7 +612,7 @@ function loadCore(){
   loadingCore = loadSet(CORE_SMP).then(res=>{
     coreReady = res.some(Boolean);
     loadFailed = !coreReady;
-    if(coreReady) loadSet(EXTRA_SMP);       // останалите — тихо, във фонов режим
+    if(coreReady) loadSet(EXTRA_SMP);       // останалите - тихо, във фонов режим
     return coreReady;
   });
   return loadingCore;
@@ -599,7 +620,7 @@ function loadCore(){
 
 /* ---------- избор на мостра ---------- */
 /* Точната нота, ако е налична (без транспониране). Иначе най-близката в рамките
-   на 2 полутона. Ако има само отворените струни — мострата на самата струна,
+   на 2 полутона. Ако има само отворените струни - мострата на самата струна,
    транспонирана точно с 2^(праг/12). */
 function pickSample(midi, openMidi){
   if(smp.has(midi)) return {buf:smp.get(midi), midi:midi};
@@ -621,8 +642,8 @@ function playString(t, midi, openMidi, gain){
   // ключовата формула: транспониране спрямо прага
   src.playbackRate.value = Math.pow(2, (midi - s.midi)/12) * (1 + (Math.random()-0.5)*0.0012);
 
-  // g   — управлява се от mute() при смяна на акорд
-  // dec — естественото заглъхване на струната; отделен възел, за да не се бият
+  // g   - управлява се от mute() при смяна на акорд
+  // dec - естественото заглъхване на струната; отделен възел, за да не се бият
   const g = ac.createGain();
   g.gain.setValueAtTime(0.0001, t);
   g.gain.linearRampToValueAtTime(gain, t+0.004);
@@ -643,7 +664,7 @@ function playString(t, midi, openMidi, gain){
 
 /* Заглушаване на звънящите струни при смяна на акорд.
    setTargetAtTime тръгва точно от стойността в момент t и се приближава
-   експоненциално към целта — както дланта ляга върху струните, без пукане. */
+   експоненциално към целта - както дланта ляга върху струните, без пукане. */
 function mute(t, amount, tau){
   active.forEach(n=>{
     if(n.end > t){
@@ -678,7 +699,7 @@ function strum(t, name, dir, accent){
 }
 
 /* Метрономът на референцията е мек, дървен клик: центроид ~648 Hz и нищо
-   осезаемо над 2.8 kHz — не е острото "пиик" на чист синус на 1.5 kHz. */
+   осезаемо над 2.8 kHz - не е острото "пиик" на чист синус на 1.5 kHz. */
 function click(t, accent){
   const o = ac.createOscillator(), g = ac.createGain(),
         f = ac.createBiquadFilter(), lp = ac.createBiquadFilter();
@@ -692,7 +713,7 @@ function click(t, accent){
   o.start(t); o.stop(t+0.08);
 }
 
-function prewarm(){ /* мострите се кешират глобално — няма какво да се подгрява */ }
+function prewarm(){ /* мострите се кешират глобално - няма какво да се подгрява */ }
 
 /* ================= UI ================= */
 function buildSelect(){
@@ -709,33 +730,55 @@ function buildSelect(){
 /* ---------- удари на акорд ----------
    Само при упражненията за смяна на акорди. Песните винаги вървят по цял такт
    (4 удара), защото прогресията им е музикална и не бива да се реже. */
-let beatsPer = 4, beatsRandom = false, curSlots = 8;
+let beatsPer = 4, shuffleOn = false, curSlots = 8, chordOrder = null;
 
 function isSwitch(){ return !!(cur && SWITCH_GRPS.includes(cur.grp)); }
 
 function pickSlots(){
   if(!isSwitch()) return 8;                       // цял такт за песните
-  const b = beatsRandom ? [1,2,4][Math.floor(Math.random()*3)] : beatsPer;
-  return b*2;                                     // един удар = две осмини
+  return beatsPer*2;                              // един удар = две осмини
+}
+
+/* Разбъркан ред на акордите. Разбърква се наново при всяко завъртане, за да не
+   се запомня последователността, а самите акорди. Новият цикъл не започва със
+   същия акорд, с който е свършил предишният. */
+function makeOrder(){
+  const n = cur.c.length;
+  const a = [...Array(n).keys()];
+  if(!shuffleOn || n < 3) return a;
+  for(let i=n-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  if(chordOrder && a[0]===chordOrder[n-1]) [a[0],a[1]]=[a[1],a[0]];
+  return a;
+}
+
+/* Кой акорд стои на позиция i, съобразен с разбъркването */
+function chordAt(i){
+  const n = cur.c.length, p = ((i%n)+n)%n;
+  return cur.c[chordOrder ? chordOrder[p] : p];
 }
 
 function renderBeats(){
   $('app').classList.toggle('switching', isSwitch());
-  document.querySelectorAll('#beats button').forEach(b=>{
-    const v = b.dataset.bp;
-    b.classList.toggle('on', beatsRandom ? v==='r' : v===String(beatsPer));
+  document.querySelectorAll('#beats button[data-bp]').forEach(b=>{
+    b.classList.toggle('on', b.dataset.bp===String(beatsPer));
   });
+  const sb = $('shufBtn'); if(sb) sb.classList.toggle('on', shuffleOn);
 }
 
-document.querySelectorAll('#beats button').forEach(b=>{
+document.querySelectorAll('#beats button[data-bp]').forEach(b=>{
   b.onclick = ()=>{
-    const v = b.dataset.bp;
-    if(v==='r') beatsRandom = true;
-    else { beatsRandom = false; beatsPer = +v; }
+    beatsPer = +b.dataset.bp;
     renderBeats(); renderStrum();
     if(!playing) curSlots = pickSlots();
   };
 });
+
+$('shufBtn').onclick = ()=>{
+  shuffleOn = !shuffleOn;
+  chordOrder = makeOrder();
+  renderBeats();
+  if(!playing){ bar = 0; renderChords(); highlight(); }
+};
 
 function load(i){
   stop();
@@ -744,6 +787,7 @@ function load(i){
   if(SWITCH_GRPS.includes(cur.grp)) cur.b = 60;
   bpm = cur.b; $('bpm').value = bpm; $('bpmVal').textContent = bpm;
   bar = 0; slot = 0; curSlots = pickSlots();
+  chordOrder = null; chordOrder = makeOrder();
   renderAnchorBtn(); renderBeats(); renderDots(); renderChords(); renderStrum(); syncBpmReset();
   if(ac) setTimeout(prewarm, 20);
 }
@@ -769,16 +813,16 @@ $('anchorBtn').onclick = ()=>{
 
 function renderDots(){ $('dots').innerHTML = cur.c.map((_,i)=>`<div class="dot ${i===bar?'on':''}"></div>`).join(''); }
 function renderChords(){
-  const n = cur.c.length;
   const cell=(name,cls)=>`<div class="slot ${cls}"><div class="frame">${chordSVG(A(name))}</div></div>`;
-  $('chords').innerHTML = cell(cur.c[(bar-1+n)%n],'side')+cell(cur.c[bar],'center')+cell(cur.c[(bar+1)%n],'side');
+  $('chords').innerHTML = cell(chordAt(bar-1),'side')+cell(chordAt(bar),'center')+cell(chordAt(bar+1),'side');
 }
 function renderStrum(){
-  /* само визуализация - патернът не е кликаем/редактируем от юзъра.
-     При по-къс акорд ударите извън обхвата стоят приглушени. */
-  const lim = (isSwitch() && !beatsRandom) ? beatsPer*2 : 8;
+  /* Единното движение: ръката бие осмини без прекъсване - надолу на четните,
+     нагоре на нечетните позиции. Посоката НИКОГА не се мени, мени се само дали
+     ударът докосва струните. Приглушените са "призрачни" удари. */
+  const lim = isSwitch() ? beatsPer*2 : 8;
   $('strum').innerHTML = cur.p.map((v,i)=>
-    `<div class="beat ${v!=='-'?'act':''}${i>=lim?' off':''}">${v==='U'?'↑':'↓'}</div>`).join('');
+    `<div class="beat ${v!=='-'?'act':'ghost'}${i>=lim?' off':''}">${i%2===0?'↓':'↑'}</div>`).join('');
   $('app').dataset.lim = lim;
 }
 function highlight(){
@@ -799,12 +843,16 @@ function schedule(){
     } else {
       if(slot%2===0) click(nextTime, slot===0);
       const v = cur.p[slot];
-      if(v!=='-') strum(nextTime, cur.c[bar], v, slot===0);
+      if(v!=='-') strum(nextTime, chordAt(bar), v, slot===0);
       queue.push({t:nextTime, bar:bar, slot:slot, cs:curSlots});
       nextTime += (60/bpm)/2;
       slot++;
       // акордът се сменя след толкова осмини, колкото искат ударите на акорд
-      if(slot>=curSlots){ slot=0; bar=(bar+1)%cur.c.length; curSlots=pickSlots(); }
+      if(slot>=curSlots){
+        slot=0; bar=(bar+1)%cur.c.length;
+        if(bar===0) chordOrder = makeOrder();     // нов цикъл - нов разбъркан ред
+        curSlots=pickSlots();
+      }
     }
   }
 }
@@ -855,6 +903,7 @@ function start(){
   keepAwake(true);
   playing = true;
   bar=0; slot=0; queue=[]; lastBar=-1; lastChord=null; active=[];
+  chordOrder = makeOrder();
   curSlots = pickSlots();
   countIn = 3;                                   // 3 · 2 · 1 и тръгва
   nextTime = ac.currentTime + 0.25;
@@ -919,7 +968,7 @@ load(0);
 // мострите тръгват да се теглят веднага при отваряне, за да е Play моментален
 setTimeout(()=>{ try{ loadCore(); }catch(e){} }, 200);
 
-// офлайн режим (работи само по https, т.е. на GitHub Pages — не при отваряне от диска)
+// офлайн режим (работи само по https, т.е. на GitHub Pages - не при отваряне от диска)
 if('serviceWorker' in navigator)
   window.addEventListener('load', ()=> navigator.serviceWorker.register('sw.js').catch(()=>{}));
 
@@ -1012,7 +1061,7 @@ window.__polish();
 
 
 <script>
-// офлайн режим (работи само по https, т.е. на GitHub Pages — не при отваряне от диска)
+// офлайн режим (работи само по https, т.е. на GitHub Pages - не при отваряне от диска)
 if('serviceWorker' in navigator)
   window.addEventListener('load', ()=> navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script>

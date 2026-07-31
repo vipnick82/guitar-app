@@ -1,4 +1,4 @@
-/* Service worker — прави приложението достъпно офлайн.
+/* Service worker - прави приложението достъпно офлайн.
    Кешира самата страница и всички mp3 мостри на китарата, така че
    след първото отваряне работи и без интернет (в самолет, в мазето, навсякъде). */
 
@@ -16,7 +16,7 @@ const SAMPLE_HOSTS = ['nbrosowsky.github.io', 'raw.githubusercontent.com'];
 self.addEventListener('install', e=>{
   e.waitUntil(
     caches.open(VERSION)
-      // addAll се проваля целият, ако един файл липсва — затова добавяме поединично
+      // addAll се проваля целият, ако един файл липсва - затова добавяме поединично
       .then(c => Promise.all(SHELL.map(u => c.add(u).catch(()=>{}))))
       .then(()=> self.skipWaiting())
   );
